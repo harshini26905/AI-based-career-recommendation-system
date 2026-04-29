@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Career Path Recommendation System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #4f8cff;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --danger: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── PAGE MANAGEMENT ─────────────────────────── */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: flex; flex-direction: column; }
+
+  /* ── LOGIN PAGE ─────────────────────────────── */
+  #loginPage {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 20% 50%, #1a2a4a 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, #1a1040 0%, transparent 50%),
+                var(--bg);
+  }
+
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 48px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .brand-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 26px;
+  }
+
+  .brand h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .brand p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .form-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,140,255,0.12);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* ── STUDENT INFO PAGE ───────────────────────── */
+  #studentPage {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at 70% 30%, #1a1040 0%, transparent 50%), var(--bg);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .card-header {
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(79,140,255,0.12);
+    border: 1px solid rgba(79,140,255,0.3);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .card-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .card-header p { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+  .select-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    transition: border-color 0.2s;
+  }
+
+  .select-input:focus { border-color: var(--accent); }
+  .select-input option { background: var(--surface2); }
+
+  /* ── SKILLS PAGE ─────────────────────────────── */
+  #skillsPage {
+    background: var(--bg);
+    padding: 0;
+  }
+
+  .skills-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .skills-header-left h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .student-info-badge {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .info-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .info-chip span { color: var(--text); font-weight: 600; }
+
+  .skills-body {
+    padding: 32px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .skills-section { margin-bottom: 40px; }
+
+  .skills-section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .skills-section h3 .count-badge {
+    background: rgba(79,140,255,0.15);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .skill-chip {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+    color: var(--text);
+  }
+
+  .skill-chip:hover {
+    border-color: var(--accent);
+    background: rgba(79,140,255,0.06);
+    color: #fff;
+  }
+
+  .skill-chip.selected {
+    background: rgba(79,140,255,0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .skill-chip.selected-soft {
+    background: rgba(167,139,250,0.18);
+    border-color: var(--accent2);
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
+  .btn-predict {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 16px 32px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: block;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.03em;
+  }
+
+  .btn-predict:hover { opacity: 0.9; }
+  .btn-predict:active { transform: scale(0.99); }
+  .btn-predict:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .predict-footer {
+    padding: 16px 40px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ── RESULTS PAGE ────────────────────────────── */
+  #resultsPage {
+    background: var(--bg);
+  }
+
+  .results-header {
+    background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .results-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(79,140,255,0.12) 0%, transparent 70%);
+  }
+
+  .results-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .results-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  .results-body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 36px 40px;
+    width: 100%;
+  }
+
+  /* Top 3 match cards */
+  .top3-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  @media (max-width: 700px) {
+    .top3-grid { grid-template-columns: 1fr; }
+    .skills-header { padding: 20px; flex-direction: column; align-items: flex-start; }
+    .skills-body, .predict-footer { padding: 20px; }
+    .results-body { padding: 20px; }
+    .results-header { padding: 24px 20px; }
+    .card { padding: 28px 24px; }
+    .login-box { padding: 36px 28px; }
+  }
+
+  .match-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  .match-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .match-card.primary {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(79,140,255,0.08) 0%, var(--surface) 100%);
+  }
+
+  .match-rank {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .match-card.primary .match-rank { color: var(--accent); }
+  .match-card:not(.primary) .match-rank { color: var(--muted); }
+
+  .match-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .match-score-bar {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .match-score-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+
+  .match-card.primary .match-score-fill { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .match-card:nth-child(2) .match-score-fill { background: linear-gradient(90deg, var(--accent2), #ec4899); }
+  .match-card:nth-child(3) .match-score-fill { background: linear-gradient(90deg, var(--accent3), #06b6d4); }
+
+  .match-score-label {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .match-pct {
+    font-weight: 700;
+    font-size: 18px;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .match-card.primary .match-pct { color: var(--accent); }
+
+  /* Primary career detail */
+  .primary-detail {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .pd-header {
+    background: linear-gradient(135deg, rgba(79,140,255,0.1), rgba(167,139,250,0.08));
+    border-bottom: 1px solid var(--border);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .pd-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #fff; }
+  .pd-pct { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--accent); }
+
+  .pd-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  @media (max-width: 640px) {
+    .pd-sections { grid-template-columns: 1fr; }
+    .top3-grid { grid-template-columns: 1fr; }
+  }
+
+  .pd-section {
+    padding: 24px 28px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pd-section:nth-child(even) { border-right: none; }
+  .pd-section:nth-last-child(-n+2) { border-bottom: none; }
+
+  @media (max-width: 640px) {
+    .pd-section { border-right: none; }
+    .pd-section:last-child { border-bottom: none; }
+    .pd-section:nth-last-child(2) { border-bottom: 1px solid var(--border); }
+  }
+
+  .pd-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pd-section ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pd-section ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.45;
+  }
+
+  .pd-section ul li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Tree structure */
+  .tree-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+
+  .tree-section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tree {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 13px;
+  }
+
+  .tree-node {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tree-root {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, rgba(79,140,255,0.15), transparent);
+    border: 1px solid rgba(79,140,255,0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+
+  .tree-root-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--accent); }
+
+  .tree-children { padding-left: 24px; display: flex; flex-direction: column; gap: 6px; }
+
+  .tree-branch {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .tree-connector {
+    color: var(--muted);
+    font-family: monospace;
+    flex-shrink: 0;
+    width: 24px;
+    line-height: 1.8;
+    font-size: 14px;
+  }
+
+  .tree-leaf {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    flex: 1;
+    transition: border-color 0.2s;
+  }
+
+  .tree-leaf:hover { border-color: var(--muted); }
+
+  .tree-leaf-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .tree-leaf-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tree-tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: var(--text);
+  }
+
+  /* Navigation */
+  .back-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: 24px;
+  }
+
+  .back-btn:hover { color: var(--text); border-color: var(--muted); }
+
+  /* Info note */
+  .info-note {
+    background: rgba(79,140,255,0.07);
+    border: 1px solid rgba(79,140,255,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .info-note span:first-child { color: var(--accent); flex-shrink: 0; }
+
+  /* CGPA influence bar */
+  .cgpa-influence {
+    margin-top: 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .cgpa-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ PAGE 1: LOGIN ══════════════ -->
+<div id="loginPage" class="page active">
+  <div class="login-box">
+    <div class="brand">
+      <div class="brand-icon">🎯</div>
+      <h1>AI Career Path</h1>
+      <p>Recommendation System</p>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input class="form-input" id="loginUsername" type="text" placeholder="Enter your username" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input class="form-input" id="loginPassword" type="password" placeholder="Enter your password" />
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+    <p style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted);">Demo: any username / password</p>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE 2: STUDENT INFO ══════════════ -->
+<div id="studentPage" class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">📋 Step 1 of 2</div>
+      <h2>Student Profile</h2>
+      <p>Enter your academic details to personalize your career recommendations</p>
+    </div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input class="form-input" id="studentName" type="text" placeholder="e.g. Arjun Ramesh" />
+    </div>
+    <div class="form-group">
+      <label>Department</label>
+      <select class="select-input" id="studentDept" onchange="updateCgpaHint()">
+        <option value="">— Select your department —</option>
+        <option value="CSE">Computer Science Engineering (CSE)</option>
+        <option value="IT">Information Technology (IT)</option>
+        <option value="AI_DS">Artificial Intelligence & Data Science (AI/DS)</option>
+        <option value="CSBS">Computer Science Business Systems (CSBS)</option>
+        <option value="ECE">Electronics & Communication Engineering (ECE)</option>
+        <option value="Mechanical">Mechanical Engineering</option>
+        <option value="EEE">Electrical & Electronics Engineering (EEE)</option>
+        <option value="Civil">Civil Engineering</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>CGPA (out of 10)</label>
+      <input class="form-input" id="studentCgpa" type="number" step="0.01" min="0" max="10" placeholder="e.g. 8.5" />
+      <div class="cgpa-influence" id="cgpaHint" style="display:none;">
+        <div class="cgpa-dot" id="cgpaDot"></div>
+        <span id="cgpaHintText">CGPA will influence your recommendation confidence</span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="goToSkills()">Continue to Skills →</button>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE 3: SKILLS SELECTION ══════════════ -->
+<div id="skillsPage" class="page">
+  <div class="skills-header">
+    <div class="skills-header-left">
+      <h2>🛠️ Select Your Skills</h2>
+      <div class="student-info-badge">
+        <div class="info-chip">Name: <span id="headerName">—</span></div>
+        <div class="info-chip">Dept: <span id="headerDept">—</span></div>
+        <div class="info-chip">CGPA: <span id="headerCgpa">—</span></div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);text-align:right;">Step 2 of 2</div>
+  </div>
+
+  <div class="skills-body">
+    <div class="info-note">
+      <span>💡</span>
+      <div>Select the technical skills you know, and the soft skills that describe you best. Your selections will be matched against real career data from 400,000+ student records.</div>
+    </div>
+
+    <div class="skills-section">
+      <h3>🔧 Technical Skills <span class="count-badge" id="techCount">0 selected</span></h3>
+      <div class="skill-chips" id="techChips"></div>
+    </div>
+
+    <div class="skills-section">
+      <h3>🌟 Soft Skills <span class="count-badge" id="softCount">0 selected</span></h3>
+      <div class="skill-chips" id="softChips"></div>
+    </div>
+  </div>
+
+  <div class="predict-footer">
+    <button class="btn-predict" id="predictBtn" onclick="predict()">🔮 Predict My Career Path</button>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE 4: RESULTS ══════════════ -->
+<div id="resultsPage" class="page">
+  <div class="results-header">
+    <h2>🏆 Your Career Recommendations</h2>
+    <p id="resultsSubtitle">Personalized based on your department, CGPA, and skill profile</p>
+  </div>
+
+  <div class="results-body">
+    <button class="back-btn" onclick="showPage('skillsPage')">← Back to Skills</button>
+
+    <!-- Top 3 -->
+    <div style="margin-bottom:20px;">
+      <p style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">🏆 Top 3 Career Matches</p>
+    </div>
+    <div class="top3-grid" id="top3Grid"></div>
+
+    <!-- Primary Career Detail -->
+    <div id="primaryDetail"></div>
+
+    <!-- Tree -->
+    <div id="treeSection"></div>
+
+    <button class="back-btn" onclick="showPage('studentPage')" style="margin-top:8px;">← Start Over</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// EMBEDDED DATASET (from final_400k_dataset.csv)
+// ─────────────────────────────────────────────────────────────
+const CAREER_DATA = {"CSE":{"tech_skills":["AWS","C++","Docker","Java","Kubernetes","ML","Node.js","NumPy","Pandas","Power BI","PyTorch","Python","React","SQL","Tableau","TensorFlow"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"Site Reliability Engineer":{"tech":{"Java":0.222,"Docker":0.222,"AWS":0.216,"TensorFlow":0.218,"Tableau":0.222,"Node.js":0.2,"Python":0.449,"ML":0.228,"Pandas":0.21,"Power BI":0.23,"C++":0.227,"Kubernetes":0.219,"NumPy":0.238,"SQL":0.437,"React":0.231,"PyTorch":0.23},"soft":{"Leadership":0.508,"Problem Solving":0.504,"Adaptability":0.507,"Communication":0.505,"Critical Thinking":0.49,"Teamwork":0.487},"count":1911},"Cybersecurity Analyst":{"tech":{"Node.js":0.22,"PyTorch":0.249,"NumPy":0.206,"SQL":0.444,"ML":0.228,"Pandas":0.209,"AWS":0.228,"Python":0.448,"Tableau":0.227,"TensorFlow":0.211,"C++":0.221,"Docker":0.204,"React":0.225,"Java":0.224,"Power BI":0.237,"Kubernetes":0.218},"soft":{"Problem Solving":0.527,"Adaptability":0.48,"Communication":0.498,"Critical Thinking":0.492,"Leadership":0.509,"Teamwork":0.494},"count":2009},"API Developer":{"tech":{"Python":0.425,"Docker":0.228,"C++":0.215,"SQL":0.477,"NumPy":0.207,"Pandas":0.218,"Kubernetes":0.24,"PyTorch":0.223,"AWS":0.227,"TensorFlow":0.206,"Tableau":0.22,"React":0.218,"ML":0.203,"Java":0.224,"Power BI":0.233,"Node.js":0.234},"soft":{"Communication":0.505,"Teamwork":0.522,"Problem Solving":0.494,"Adaptability":0.495,"Critical Thinking":0.478,"Leadership":0.506},"count":1969},"Full Stack Developer":{"tech":{"React":0.239,"ML":0.221,"Tableau":0.211,"AWS":0.215,"SQL":0.465,"PyTorch":0.221,"Power BI":0.232,"Kubernetes":0.21,"C++":0.243,"Java":0.247,"Python":0.42,"Node.js":0.223,"NumPy":0.212,"Docker":0.213,"Pandas":0.219,"TensorFlow":0.21},"soft":{"Problem Solving":0.497,"Adaptability":0.504,"Teamwork":0.505,"Leadership":0.504,"Critical Thinking":0.492,"Communication":0.498},"count":2016},"System Engineer":{"tech":{"ML":0.217,"NumPy":0.225,"Docker":0.222,"Power BI":0.215,"React":0.221,"Node.js":0.219,"Kubernetes":0.226,"SQL":0.444,"C++":0.22,"Python":0.469,"Java":0.212,"TensorFlow":0.219,"Pandas":0.218,"Tableau":0.235,"AWS":0.228,"PyTorch":0.211},"soft":{"Critical Thinking":0.492,"Teamwork":0.489,"Communication":0.497,"Problem Solving":0.516,"Adaptability":0.505,"Leadership":0.501},"count":2009},"Ethical Hacker":{"tech":{"Tableau":0.217,"Node.js":0.241,"NumPy":0.213,"PyTorch":0.215,"Kubernetes":0.218,"Pandas":0.228,"Python":0.456,"Power BI":0.212,"React":0.201,"Java":0.202,"SQL":0.451,"Docker":0.231,"ML":0.23,"C++":0.231,"AWS":0.23,"TensorFlow":0.223},"soft":{"Adaptability":0.509,"Communication":0.503,"Leadership":0.495,"Critical Thinking":0.497,"Teamwork":0.512,"Problem Solving":0.484},"count":2006},"Database Administrator":{"tech":{"Python":0.453,"Java":0.217,"Node.js":0.228,"SQL":0.43,"ML":0.225,"Pandas":0.211,"AWS":0.223,"React":0.23,"Tableau":0.212,"Kubernetes":0.234,"NumPy":0.242,"Docker":0.21,"Power BI":0.234,"C++":0.211,"TensorFlow":0.225,"PyTorch":0.215},"soft":{"Communication":0.517,"Adaptability":0.498,"Leadership":0.507,"Teamwork":0.513,"Problem Solving":0.479,"Critical Thinking":0.485},"count":1892},"Machine Learning Engineer":{"tech":{"PyTorch":0.214,"Python":0.434,"Kubernetes":0.209,"SQL":0.446,"TensorFlow":0.224,"Pandas":0.235,"Java":0.24,"Power BI":0.229,"Docker":0.237,"AWS":0.211,"React":0.216,"Tableau":0.222,"NumPy":0.22,"Node.js":0.223,"C++":0.223,"ML":0.216},"soft":{"Critical Thinking":0.502,"Teamwork":0.506,"Adaptability":0.493,"Problem Solving":0.506,"Communication":0.501,"Leadership":0.491},"count":2043},"Platform Engineer":{"tech":{"NumPy":0.227,"SQL":0.45,"Power BI":0.227,"Java":0.226,"Node.js":0.232,"Docker":0.214,"TensorFlow":0.223,"Python":0.449,"Pandas":0.228,"AWS":0.216,"React":0.237,"PyTorch":0.203,"C++":0.203,"Kubernetes":0.226,"Tableau":0.222,"ML":0.215},"soft":{"Adaptability":0.508,"Teamwork":0.492,"Communication":0.524,"Leadership":0.494,"Critical Thinking":0.483,"Problem Solving":0.5},"count":1967},"Game Developer":{"tech":{"NumPy":0.208,"Pandas":0.223,"PyTorch":0.217,"TensorFlow":0.22,"Power BI":0.227,"ML":0.221,"React":0.225,"Python":0.432,"Java":0.232,"C++":0.236,"Tableau":0.227,"Kubernetes":0.24,"Docker":0.217,"SQL":0.442,"Node.js":0.204,"AWS":0.229},"soft":{"Adaptability":0.502,"Critical Thinking":0.486,"Teamwork":0.512,"Problem Solving":0.519,"Leadership":0.493,"Communication":0.489},"count":2023},"Mobile App Developer":{"tech":{"Pandas":0.219,"Tableau":0.225,"TensorFlow":0.233,"Java":0.227,"Python":0.43,"NumPy":0.212,"C++":0.215,"Docker":0.224,"React":0.224,"ML":0.236,"Node.js":0.231,"Kubernetes":0.239,"PyTorch":0.205,"AWS":0.219,"SQL":0.441,"Power BI":0.22},"soft":{"Teamwork":0.501,"Critical Thinking":0.505,"Adaptability":0.494,"Leadership":0.487,"Problem Solving":0.518,"Communication":0.495},"count":1985},"DevOps Engineer":{"tech":{"C++":0.2,"Java":0.222,"Python":0.439,"NumPy":0.225,"AWS":0.248,"Pandas":0.205,"Docker":0.218,"PyTorch":0.229,"React":0.223,"Kubernetes":0.222,"ML":0.226,"Tableau":0.244,"Node.js":0.217,"Power BI":0.222,"TensorFlow":0.219,"SQL":0.443},"soft":{"Problem Solving":0.502,"Adaptability":0.515,"Teamwork":0.501,"Leadership":0.487,"Critical Thinking":0.487,"Communication":0.508},"count":2031},"Software Developer":{"tech":{"Node.js":0.227,"NumPy":0.218,"AWS":0.214,"TensorFlow":0.226,"Pandas":0.228,"React":0.215,"Kubernetes":0.213,"PyTorch":0.229,"Python":0.444,"Java":0.215,"Tableau":0.205,"Docker":0.22,"SQL":0.475,"Power BI":0.21,"ML":0.231,"C++":0.232},"soft":{"Communication":0.506,"Teamwork":0.498,"Leadership":0.496,"Critical Thinking":0.508,"Adaptability":0.507,"Problem Solving":0.485},"count":2004},"Frontend Developer":{"tech":{"Docker":0.223,"NumPy":0.215,"React":0.227,"SQL":0.453,"PyTorch":0.212,"Power BI":0.233,"Python":0.434,"ML":0.214,"Java":0.238,"Tableau":0.224,"TensorFlow":0.227,"C++":0.211,"Pandas":0.217,"AWS":0.217,"Kubernetes":0.209,"Node.js":0.245},"soft":{"Adaptability":0.5,"Teamwork":0.489,"Critical Thinking":0.509,"Leadership":0.51,"Problem Solving":0.508,"Communication":0.484},"count":1976},"Software Engineer":{"tech":{"SQL":0.436,"ML":0.23,"Node.js":0.218,"Pandas":0.22,"NumPy":0.232,"Python":0.443,"TensorFlow":0.211,"React":0.24,"C++":0.23,"PyTorch":0.223,"Tableau":0.22,"AWS":0.233,"Docker":0.214,"Power BI":0.22,"Java":0.206,"Kubernetes":0.226},"soft":{"Communication":0.5,"Problem Solving":0.492,"Leadership":0.513,"Critical Thinking":0.494,"Adaptability":0.514,"Teamwork":0.487},"count":2068},"Data Scientist":{"tech":{"Python":0.465,"TensorFlow":0.213,"AWS":0.208,"Pandas":0.22,"Tableau":0.238,"ML":0.231,"SQL":0.458,"React":0.209,"Node.js":0.219,"Java":0.231,"C++":0.208,"Power BI":0.231,"Kubernetes":0.209,"NumPy":0.223,"PyTorch":0.214,"Docker":0.224},"soft":{"Critical Thinking":0.503,"Problem Solving":0.494,"Adaptability":0.497,"Leadership":0.498,"Communication":0.501,"Teamwork":0.506},"count":1960},"AR/VR Developer":{"tech":{"Python":0.438,"TensorFlow":0.219,"ML":0.227,"Node.js":0.223,"Java":0.222,"Pandas":0.239,"Power BI":0.205,"SQL":0.455,"AWS":0.21,"Tableau":0.209,"Docker":0.213,"PyTorch":0.226,"Kubernetes":0.224,"C++":0.232,"React":0.236,"NumPy":0.22},"soft":{"Leadership":0.515,"Teamwork":0.494,"Critical Thinking":0.504,"Communication":0.486,"Adaptability":0.5,"Problem Solving":0.5},"count":2010},"Blockchain Developer":{"tech":{"TensorFlow":0.209,"Python":0.444,"Kubernetes":0.24,"C++":0.212,"SQL":0.432,"NumPy":0.219,"ML":0.236,"Docker":0.233,"Power BI":0.232,"Node.js":0.227,"AWS":0.226,"Pandas":0.231,"Java":0.209,"PyTorch":0.227,"Tableau":0.204,"React":0.218},"soft":{"Critical Thinking":0.507,"Leadership":0.496,"Adaptability":0.496,"Teamwork":0.499,"Communication":0.492,"Problem Solving":0.51},"count":2009},"Software Tester (QA)":{"tech":{"Kubernetes":0.218,"Docker":0.193,"Tableau":0.229,"PyTorch":0.234,"Python":0.443,"C++":0.236,"NumPy":0.22,"SQL":0.432,"ML":0.225,"React":0.242,"TensorFlow":0.222,"AWS":0.221,"Java":0.212,"Pandas":0.23,"Node.js":0.212,"Power BI":0.233},"soft":{"Communication":0.511,"Leadership":0.496,"Teamwork":0.513,"Problem Solving":0.5,"Adaptability":0.493,"Critical Thinking":0.487},"count":2012},"Data Analyst":{"tech":{"Node.js":0.223,"PyTorch":0.207,"Power BI":0.235,"TensorFlow":0.224,"NumPy":0.223,"SQL":0.443,"Python":0.453,"AWS":0.203,"Tableau":0.225,"React":0.218,"Pandas":0.209,"Docker":0.244,"ML":0.226,"C++":0.215,"Kubernetes":0.223,"Java":0.228},"soft":{"Critical Thinking":0.514,"Adaptability":0.507,"Problem Solving":0.495,"Teamwork":0.512,"Communication":0.486,"Leadership":0.485},"count":2057},"AI Engineer":{"tech":{"C++":0.227,"Docker":0.216,"SQL":0.443,"NumPy":0.221,"React":0.225,"Power BI":0.213,"Pandas":0.223,"Tableau":0.239,"Kubernetes":0.21,"AWS":0.206,"PyTorch":0.226,"Python":0.434,"TensorFlow":0.219,"Java":0.243,"ML":0.237,"Node.js":0.218},"soft":{"Critical Thinking":0.522,"Teamwork":0.482,"Leadership":0.481,"Adaptability":0.528,"Problem Solving":0.485,"Communication":0.502},"count":1993},"Web Developer":{"tech":{"SQL":0.451,"TensorFlow":0.225,"ML":0.214,"Tableau":0.222,"Node.js":0.227,"Docker":0.241,"AWS":0.203,"NumPy":0.214,"PyTorch":0.216,"Java":0.2,"Python":0.456,"Power BI":0.228,"Pandas":0.22,"React":0.222,"Kubernetes":0.232,"C++":0.23},"soft":{"Critical Thinking":0.496,"Adaptability":0.489,"Communication":0.529,"Teamwork":0.491,"Leadership":0.503,"Problem Solving":0.493},"count":2075},"Automation Engineer":{"tech":{"TensorFlow":0.225,"ML":0.216,"Tableau":0.234,"Power BI":0.23,"SQL":0.449,"Python":0.449,"Docker":0.21,"NumPy":0.217,"Java":0.222,"PyTorch":0.23,"Pandas":0.232,"C++":0.223,"Kubernetes":0.21,"Node.js":0.212,"React":0.214,"AWS":0.226},"soft":{"Teamwork":0.494,"Adaptability":0.492,"Leadership":0.502,"Problem Solving":0.519,"Critical Thinking":0.496,"Communication":0.496},"count":1952},"Cloud Engineer":{"tech":{"SQL":0.456,"Java":0.236,"Python":0.432,"TensorFlow":0.223,"Node.js":0.24,"NumPy":0.224,"Kubernetes":0.213,"React":0.217,"PyTorch":0.223,"C++":0.228,"Docker":0.212,"Tableau":0.21,"Pandas":0.215,"ML":0.226,"Power BI":0.218,"AWS":0.226},"soft":{"Adaptability":0.505,"Communication":0.492,"Teamwork":0.5,"Critical Thinking":0.513,"Problem Solving":0.505,"Leadership":0.485},"count":2044},"Backend Developer":{"tech":{"Java":0.221,"NumPy":0.232,"React":0.215,"Power BI":0.223,"Node.js":0.232,"Python":0.439,"SQL":0.451,"Tableau":0.225,"Pandas":0.204,"Docker":0.223,"ML":0.23,"AWS":0.24,"Kubernetes":0.219,"C++":0.205,"PyTorch":0.215,"TensorFlow":0.224},"soft":{"Adaptability":0.499,"Leadership":0.486,"Communication":0.517,"Critical Thinking":0.51,"Problem Solving":0.475,"Teamwork":0.513},"count":1979}}},"IT":{"tech_skills":["AWS","C++","Docker","Java","Kubernetes","ML","Node.js","NumPy","Pandas","Power BI","PyTorch","Python","React","SQL","Tableau","TensorFlow"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"IT Auditor":{"tech":{"Node.js":0.211,"Tableau":0.233,"Pandas":0.225,"SQL":0.452,"NumPy":0.231,"Java":0.22,"Power BI":0.214,"TensorFlow":0.224,"PyTorch":0.225,"Python":0.452,"Kubernetes":0.218,"Docker":0.218,"ML":0.223,"C++":0.208,"AWS":0.219,"React":0.228},"soft":{"Communication":0.509,"Leadership":0.497,"Critical Thinking":0.491,"Problem Solving":0.502,"Teamwork":0.497,"Adaptability":0.504},"count":2031},"Web Developer":{"tech":{"Power BI":0.211,"Python":0.436,"Tableau":0.225,"C++":0.233,"NumPy":0.222,"SQL":0.432,"Pandas":0.218,"Docker":0.22,"PyTorch":0.241,"Kubernetes":0.216,"Java":0.223,"ML":0.227,"AWS":0.218,"React":0.213,"Node.js":0.222,"TensorFlow":0.244},"soft":{"Problem Solving":0.494,"Communication":0.506,"Leadership":0.5,"Critical Thinking":0.502,"Adaptability":0.504,"Teamwork":0.494},"count":2007},"Cloud Architect":{"tech":{"Node.js":0.227,"React":0.229,"Python":0.436,"Docker":0.21,"SQL":0.439,"AWS":0.227,"NumPy":0.212,"Tableau":0.233,"PyTorch":0.213,"Java":0.216,"ML":0.232,"Pandas":0.212,"TensorFlow":0.228,"C++":0.226,"Kubernetes":0.236,"Power BI":0.225},"soft":{"Adaptability":0.504,"Problem Solving":0.497,"Critical Thinking":0.495,"Leadership":0.508,"Communication":0.496,"Teamwork":0.5},"count":2043},"Network Engineer":{"tech":{"ML":0.214,"C++":0.228,"TensorFlow":0.224,"AWS":0.22,"NumPy":0.228,"Tableau":0.219,"Python":0.456,"React":0.222,"PyTorch":0.227,"Java":0.214,"SQL":0.435,"Pandas":0.213,"Node.js":0.221,"Kubernetes":0.227,"Docker":0.242,"Power BI":0.212},"soft":{"Problem Solving":0.51,"Communication":0.493,"Teamwork":0.504,"Adaptability":0.509,"Critical Thinking":0.474,"Leadership":0.51},"count":1923},"IT Analyst":{"tech":{"Kubernetes":0.229,"Pandas":0.223,"ML":0.222,"Power BI":0.207,"PyTorch":0.232,"TensorFlow":0.216,"AWS":0.217,"Python":0.444,"Tableau":0.221,"Docker":0.208,"Java":0.217,"SQL":0.464,"React":0.221,"Node.js":0.215,"C++":0.224,"NumPy":0.24},"soft":{"Adaptability":0.5,"Teamwork":0.488,"Problem Solving":0.506,"Communication":0.508,"Critical Thinking":0.501,"Leadership":0.497},"count":2046},"Infrastructure Engineer":{"tech":{"React":0.219,"Tableau":0.216,"PyTorch":0.219,"Pandas":0.227,"NumPy":0.221,"Power BI":0.232,"Kubernetes":0.226,"SQL":0.446,"Java":0.22,"ML":0.229,"AWS":0.231,"Docker":0.22,"C++":0.219,"Node.js":0.221,"TensorFlow":0.223,"Python":0.43},"soft":{"Teamwork":0.496,"Problem Solving":0.495,"Critical Thinking":0.484,"Leadership":0.513,"Communication":0.497,"Adaptability":0.515},"count":1975},"Application Support Engineer":{"tech":{"ML":0.217,"PyTorch":0.218,"C++":0.218,"React":0.226,"SQL":0.44,"Node.js":0.223,"Python":0.451,"NumPy":0.209,"Kubernetes":0.21,"TensorFlow":0.216,"Power BI":0.243,"AWS":0.236,"Java":0.225,"Tableau":0.223,"Docker":0.225,"Pandas":0.22},"soft":{"Teamwork":0.513,"Leadership":0.498,"Communication":0.489,"Problem Solving":0.506,"Critical Thinking":0.496,"Adaptability":0.498},"count":1989},"Technical Writer":{"tech":{"AWS":0.219,"Node.js":0.228,"Pandas":0.221,"ML":0.211,"Python":0.439,"PyTorch":0.227,"Tableau":0.219,"C++":0.232,"Docker":0.21,"TensorFlow":0.231,"Power BI":0.225,"Java":0.218,"NumPy":0.216,"React":0.223,"SQL":0.451,"Kubernetes":0.229},"soft":{"Critical Thinking":0.506,"Leadership":0.486,"Problem Solving":0.484,"Adaptability":0.509,"Teamwork":0.512,"Communication":0.502},"count":2032},"Technical Support Specialist":{"tech":{"Pandas":0.218,"Power BI":0.22,"Docker":0.224,"Python":0.445,"PyTorch":0.23,"Java":0.219,"NumPy":0.22,"AWS":0.228,"SQL":0.441,"ML":0.223,"Tableau":0.211,"C++":0.226,"Kubernetes":0.231,"TensorFlow":0.218,"Node.js":0.217,"React":0.229},"soft":{"Problem Solving":0.508,"Leadership":0.501,"Communication":0.486,"Teamwork":0.506,"Adaptability":0.491,"Critical Thinking":0.509},"count":1919},"DevOps Engineer":{"tech":{"React":0.216,"Python":0.477,"Node.js":0.219,"ML":0.233,"Power BI":0.219,"Pandas":0.208,"AWS":0.224,"NumPy":0.206,"SQL":0.438,"Java":0.221,"TensorFlow":0.236,"PyTorch":0.223,"Kubernetes":0.22,"Tableau":0.22,"Docker":0.224,"C++":0.216},"soft":{"Communication":0.478,"Leadership":0.505,"Problem Solving":0.498,"Teamwork":0.511,"Adaptability":0.506,"Critical Thinking":0.501},"count":1940},"IT Support Engineer":{"tech":{"SQL":0.428,"NumPy":0.244,"Docker":0.205,"Power BI":0.232,"ML":0.202,"C++":0.209,"Pandas":0.219,"Node.js":0.227,"Tableau":0.22,"Java":0.224,"PyTorch":0.228,"React":0.256,"Python":0.445,"AWS":0.221,"TensorFlow":0.224,"Kubernetes":0.219},"soft":{"Problem Solving":0.51,"Adaptability":0.501,"Communication":0.504,"Critical Thinking":0.505,"Leadership":0.495,"Teamwork":0.485},"count":1975},"Cloud Engineer":{"tech":{"SQL":0.462,"PyTorch":0.22,"C++":0.219,"ML":0.22,"Node.js":0.2,"AWS":0.226,"Kubernetes":0.219,"Power BI":0.224,"Python":0.446,"TensorFlow":0.215,"Java":0.225,"Tableau":0.228,"Docker":0.222,"React":0.231,"Pandas":0.215,"NumPy":0.23},"soft":{"Teamwork":0.491,"Problem Solving":0.521,"Adaptability":0.48,"Communication":0.499,"Leadership":0.502,"Critical Thinking":0.506},"count":2013},"Cybersecurity Analyst":{"tech":{"Python":0.459,"Node.js":0.212,"Java":0.247,"C++":0.23,"PyTorch":0.221,"Tableau":0.215,"React":0.209,"Power BI":0.216,"AWS":0.214,"Pandas":0.206,"NumPy":0.225,"Docker":0.224,"SQL":0.467,"Kubernetes":0.228,"ML":0.214,"TensorFlow":0.214},"soft":{"Problem Solving":0.504,"Adaptability":0.507,"Communication":0.508,"Leadership":0.49,"Teamwork":0.493,"Critical Thinking":0.497},"count":1954},"Data Analyst":{"tech":{"SQL":0.464,"Pandas":0.232,"Node.js":0.227,"React":0.215,"PyTorch":0.219,"Docker":0.219,"TensorFlow":0.215,"Power BI":0.216,"Java":0.213,"Python":0.434,"Kubernetes":0.217,"ML":0.231,"Tableau":0.223,"C++":0.231,"NumPy":0.223,"AWS":0.221},"soft":{"Leadership":0.496,"Critical Thinking":0.506,"Communication":0.5,"Adaptability":0.495,"Teamwork":0.5,"Problem Solving":0.503},"count":1945},"Database Administrator":{"tech":{"Kubernetes":0.23,"PyTorch":0.226,"NumPy":0.237,"Power BI":0.218,"C++":0.218,"ML":0.219,"Java":0.226,"SQL":0.454,"Pandas":0.218,"Python":0.428,"TensorFlow":0.211,"React":0.21,"AWS":0.233,"Node.js":0.218,"Docker":0.225,"Tableau":0.23},"soft":{"Leadership":0.51,"Adaptability":0.49,"Teamwork":0.501,"Critical Thinking":0.497,"Problem Solving":0.494,"Communication":0.509},"count":1997},"Operations Engineer":{"tech":{"NumPy":0.216,"SQL":0.439,"Power BI":0.218,"PyTorch":0.225,"Python":0.448,"AWS":0.218,"Node.js":0.223,"ML":0.235,"TensorFlow":0.224,"C++":0.224,"React":0.23,"Pandas":0.222,"Java":0.232,"Docker":0.222,"Tableau":0.22,"Kubernetes":0.204},"soft":{"Critical Thinking":0.501,"Communication":0.501,"Adaptability":0.502,"Leadership":0.501,"Teamwork":0.5,"Problem Solving":0.494},"count":2016},"Information Security Analyst":{"tech":{"Python":0.44,"C++":0.252,"PyTorch":0.208,"React":0.241,"Node.js":0.234,"ML":0.218,"AWS":0.219,"Docker":0.228,"NumPy":0.218,"SQL":0.444,"TensorFlow":0.216,"Pandas":0.224,"Tableau":0.216,"Kubernetes":0.215,"Java":0.202,"Power BI":0.224},"soft":{"Communication":0.496,"Critical Thinking":0.504,"Leadership":0.484,"Teamwork":0.521,"Adaptability":0.49,"Problem Solving":0.505},"count":2029},"Help Desk Engineer":{"tech":{"SQL":0.436,"Python":0.437,"Kubernetes":0.234,"TensorFlow":0.222,"Tableau":0.218,"NumPy":0.219,"ML":0.222,"Java":0.227,"React":0.236,"Node.js":0.223,"C++":0.211,"Pandas":0.217,"AWS":0.233,"Docker":0.214,"Power BI":0.227,"PyTorch":0.223},"soft":{"Critical Thinking":0.507,"Communication":0.5,"Adaptability":0.506,"Teamwork":0.49,"Problem Solving":0.499,"Leadership":0.497},"count":1980},"Network Security Engineer":{"tech":{"SQL":0.457,"Python":0.465,"Pandas":0.233,"Kubernetes":0.216,"ML":0.215,"C++":0.219,"Java":0.227,"AWS":0.228,"Node.js":0.222,"Docker":0.213,"React":0.217,"PyTorch":0.218,"Tableau":0.227,"TensorFlow":0.209,"NumPy":0.226,"Power BI":0.209},"soft":{"Leadership":0.505,"Communication":0.489,"Adaptability":0.501,"Teamwork":0.502,"Critical Thinking":0.508,"Problem Solving":0.495},"count":1989},"Business Analyst":{"tech":{"AWS":0.215,"ML":0.24,"SQL":0.458,"C++":0.21,"Power BI":0.213,"Docker":0.222,"Python":0.443,"PyTorch":0.23,"Node.js":0.216,"Tableau":0.219,"TensorFlow":0.217,"React":0.223,"Kubernetes":0.219,"NumPy":0.209,"Pandas":0.225,"Java":0.242},"soft":{"Communication":0.517,"Problem Solving":0.483,"Critical Thinking":0.521,"Leadership":0.498,"Adaptability":0.492,"Teamwork":0.489},"count":2084},"System Administrator":{"tech":{"Docker":0.238,"Java":0.225,"Power BI":0.223,"ML":0.231,"Pandas":0.232,"AWS":0.227,"Python":0.445,"SQL":0.438,"TensorFlow":0.233,"C++":0.23,"Node.js":0.22,"React":0.222,"Kubernetes":0.214,"PyTorch":0.221,"Tableau":0.199,"NumPy":0.205},"soft":{"Problem Solving":0.48,"Teamwork":0.51,"Critical Thinking":0.515,"Communication":0.524,"Adaptability":0.474,"Leadership":0.497},"count":2021},"Systems Analyst":{"tech":{"TensorFlow":0.224,"Kubernetes":0.229,"ML":0.222,"SQL":0.436,"Python":0.452,"AWS":0.219,"C++":0.215,"Java":0.222,"Power BI":0.233,"Docker":0.24,"React":0.229,"NumPy":0.213,"Node.js":0.22,"PyTorch":0.205,"Pandas":0.233,"Tableau":0.208},"soft":{"Communication":0.487,"Problem Solving":0.509,"Adaptability":0.487,"Leadership":0.519,"Teamwork":0.497,"Critical Thinking":0.5},"count":1974},"Software Developer":{"tech":{"Tableau":0.211,"Python":0.456,"NumPy":0.224,"TensorFlow":0.226,"SQL":0.461,"Pandas":0.218,"AWS":0.206,"C++":0.217,"ML":0.221,"React":0.215,"Power BI":0.221,"Kubernetes":0.217,"PyTorch":0.238,"Node.js":0.211,"Docker":0.224,"Java":0.233},"soft":{"Leadership":0.512,"Critical Thinking":0.502,"Adaptability":0.505,"Teamwork":0.487,"Problem Solving":0.484,"Communication":0.509},"count":1973},"IT Project Manager":{"tech":{"Python":0.412,"NumPy":0.227,"Node.js":0.231,"TensorFlow":0.21,"Java":0.22,"Power BI":0.234,"Tableau":0.214,"C++":0.231,"ML":0.236,"SQL":0.441,"React":0.217,"Pandas":0.231,"Kubernetes":0.23,"Docker":0.227,"PyTorch":0.224,"AWS":0.213},"soft":{"Problem Solving":0.509,"Communication":0.489,"Teamwork":0.496,"Leadership":0.507,"Adaptability":0.507,"Critical Thinking":0.492},"count":2075},"IT Consultant":{"tech":{"Kubernetes":0.22,"AWS":0.212,"Java":0.221,"React":0.225,"Node.js":0.228,"ML":0.224,"SQL":0.427,"Pandas":0.218,"Power BI":0.213,"TensorFlow":0.231,"Python":0.465,"C++":0.233,"Tableau":0.226,"Docker":0.207,"NumPy":0.231,"PyTorch":0.221},"soft":{"Adaptability":0.506,"Leadership":0.484,"Teamwork":0.512,"Critical Thinking":0.494,"Communication":0.503,"Problem Solving":0.501},"count":2070}}},"AI_DS":{"tech_skills":["AWS","C++","Docker","Java","Kubernetes","ML","Node.js","NumPy","Pandas","Power BI","PyTorch","Python","React","SQL","Tableau","TensorFlow"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"Computer Vision Engineer":{"tech":{"Docker":0.228,"Node.js":0.217,"ML":0.22,"C++":0.228,"SQL":0.449,"React":0.196,"Python":0.45,"Kubernetes":0.216,"Java":0.233,"AWS":0.211,"Power BI":0.239,"TensorFlow":0.216,"Pandas":0.23,"NumPy":0.221,"PyTorch":0.23,"Tableau":0.217},"soft":{"Adaptability":0.494,"Problem Solving":0.499,"Communication":0.501,"Critical Thinking":0.491,"Leadership":0.514,"Teamwork":0.501},"count":1956},"Data Engineer":{"tech":{"React":0.223,"AWS":0.221,"ML":0.229,"Kubernetes":0.211,"Node.js":0.232,"SQL":0.421,"Power BI":0.244,"Docker":0.242,"Java":0.219,"Python":0.448,"NumPy":0.225,"TensorFlow":0.221,"PyTorch":0.207,"Pandas":0.213,"C++":0.216,"Tableau":0.227},"soft":{"Adaptability":0.495,"Problem Solving":0.519,"Communication":0.493,"Critical Thinking":0.497,"Leadership":0.489,"Teamwork":0.506},"count":1956},"Business Intelligence Analyst":{"tech":{"NumPy":0.208,"Python":0.421,"Kubernetes":0.23,"SQL":0.45,"Docker":0.224,"AWS":0.246,"C++":0.214,"Node.js":0.228,"Pandas":0.203,"Java":0.232,"React":0.226,"Power BI":0.219,"PyTorch":0.219,"TensorFlow":0.23,"Tableau":0.219,"ML":0.231},"soft":{"Adaptability":0.501,"Critical Thinking":0.487,"Communication":0.498,"Leadership":0.511,"Teamwork":0.496,"Problem Solving":0.507},"count":2069},"NLP Engineer":{"tech":{"C++":0.227,"SQL":0.45,"Python":0.437,"AWS":0.237,"Java":0.209,"React":0.218,"ML":0.211,"Power BI":0.226,"TensorFlow":0.247,"Tableau":0.225,"PyTorch":0.239,"Kubernetes":0.202,"Node.js":0.202,"NumPy":0.221,"Docker":0.226,"Pandas":0.224},"soft":{"Leadership":0.502,"Problem Solving":0.516,"Communication":0.494,"Adaptability":0.489,"Teamwork":0.509,"Critical Thinking":0.49},"count":1928},"Data Analyst":{"tech":{"Tableau":0.237,"Docker":0.223,"SQL":0.427,"Java":0.229,"Kubernetes":0.219,"Python":0.473,"React":0.22,"ML":0.218,"PyTorch":0.216,"Power BI":0.199,"NumPy":0.219,"TensorFlow":0.219,"AWS":0.225,"Node.js":0.231,"Pandas":0.22,"C++":0.226},"soft":{"Teamwork":0.509,"Adaptability":0.496,"Problem Solving":0.5,"Critical Thinking":0.484,"Leadership":0.502,"Communication":0.509},"count":2082},"ML Ops Engineer":{"tech":{"Python":0.427,"ML":0.227,"Docker":0.202,"Tableau":0.231,"C++":0.222,"SQL":0.462,"Kubernetes":0.219,"Power BI":0.211,"Node.js":0.239,"PyTorch":0.209,"Pandas":0.219,"NumPy":0.244,"React":0.235,"AWS":0.221,"TensorFlow":0.214,"Java":0.219},"soft":{"Adaptability":0.48,"Problem Solving":0.521,"Critical Thinking":0.505,"Teamwork":0.494,"Communication":0.507,"Leadership":0.493},"count":2032},"Data Architect":{"tech":{"SQL":0.419,"ML":0.23,"Power BI":0.209,"React":0.239,"Java":0.216,"Pandas":0.246,"Kubernetes":0.226,"C++":0.215,"Python":0.46,"Docker":0.209,"PyTorch":0.228,"TensorFlow":0.233,"Tableau":0.213,"Node.js":0.222,"NumPy":0.217,"AWS":0.219},"soft":{"Communication":0.491,"Problem Solving":0.489,"Critical Thinking":0.51,"Leadership":0.497,"Teamwork":0.492,"Adaptability":0.521},"count":2008},"AI Consultant":{"tech":{"React":0.229,"SQL":0.436,"Java":0.233,"PyTorch":0.208,"TensorFlow":0.239,"Docker":0.22,"Tableau":0.228,"NumPy":0.221,"AWS":0.212,"Python":0.441,"Pandas":0.231,"Node.js":0.197,"Power BI":0.208,"C++":0.224,"Kubernetes":0.239,"ML":0.234},"soft":{"Adaptability":0.492,"Critical Thinking":0.496,"Communication":0.501,"Teamwork":0.499,"Leadership":0.512,"Problem Solving":0.501},"count":2034},"AI Product Manager":{"tech":{"C++":0.24,"Node.js":0.201,"PyTorch":0.214,"Power BI":0.225,"TensorFlow":0.228,"Java":0.237,"ML":0.215,"Python":0.443,"SQL":0.458,"Pandas":0.228,"Docker":0.213,"AWS":0.2,"Kubernetes":0.213,"NumPy":0.225,"React":0.234,"Tableau":0.226},"soft":{"Adaptability":0.495,"Leadership":0.492,"Teamwork":0.501,"Problem Solving":0.498,"Communication":0.512,"Critical Thinking":0.503},"count":1902},"Data Visualization Specialist":{"tech":{"C++":0.229,"NumPy":0.226,"SQL":0.448,"TensorFlow":0.22,"Java":0.213,"AWS":0.23,"Node.js":0.211,"Tableau":0.224,"Python":0.456,"Kubernetes":0.22,"Docker":0.218,"Power BI":0.219,"Pandas":0.217,"ML":0.219,"React":0.232,"PyTorch":0.217},"soft":{"Problem Solving":0.506,"Teamwork":0.49,"Adaptability":0.494,"Leadership":0.512,"Communication":0.479,"Critical Thinking":0.519},"count":2015},"Data Scientist":{"tech":{"Kubernetes":0.213,"AWS":0.21,"React":0.237,"Power BI":0.222,"Pandas":0.23,"TensorFlow":0.239,"Java":0.212,"C++":0.229,"Docker":0.209,"PyTorch":0.231,"Python":0.445,"SQL":0.419,"ML":0.225,"Node.js":0.234,"NumPy":0.222,"Tableau":0.224},"soft":{"Critical Thinking":0.507,"Communication":0.494,"Problem Solving":0.511,"Teamwork":0.508,"Adaptability":0.499,"Leadership":0.481},"count":2025},"Deep Learning Engineer":{"tech":{"Kubernetes":0.239,"Node.js":0.229,"C++":0.204,"TensorFlow":0.208,"Java":0.234,"Tableau":0.225,"Pandas":0.208,"NumPy":0.219,"PyTorch":0.22,"Python":0.437,"ML":0.221,"Power BI":0.215,"AWS":0.219,"Docker":0.224,"SQL":0.451,"React":0.247},"soft":{"Leadership":0.492,"Problem Solving":0.524,"Adaptability":0.47,"Communication":0.477,"Teamwork":0.535,"Critical Thinking":0.502},"count":1934},"Recommendation System Engineer":{"tech":{"Docker":0.228,"TensorFlow":0.226,"SQL":0.433,"NumPy":0.222,"React":0.242,"Node.js":0.218,"Python":0.453,"Pandas":0.217,"C++":0.224,"AWS":0.226,"Java":0.217,"PyTorch":0.215,"Power BI":0.204,"ML":0.224,"Kubernetes":0.223,"Tableau":0.226},"soft":{"Adaptability":0.505,"Communication":0.501,"Teamwork":0.491,"Problem Solving":0.52,"Critical Thinking":0.514,"Leadership":0.469},"count":2025},"Algorithm Engineer":{"tech":{"React":0.196,"Node.js":0.232,"C++":0.217,"Power BI":0.233,"PyTorch":0.231,"Python":0.44,"AWS":0.215,"NumPy":0.221,"ML":0.218,"Tableau":0.223,"SQL":0.452,"Java":0.233,"Pandas":0.227,"Kubernetes":0.223,"TensorFlow":0.214,"Docker":0.221},"soft":{"Critical Thinking":0.519,"Problem Solving":0.498,"Communication":0.514,"Adaptability":0.479,"Teamwork":0.507,"Leadership":0.484},"count":1996},"Robotics Engineer":{"tech":{"SQL":0.451,"ML":0.233,"Docker":0.203,"Kubernetes":0.214,"C++":0.221,"Tableau":0.219,"NumPy":0.211,"TensorFlow":0.221,"React":0.221,"Pandas":0.224,"Java":0.222,"Python":0.465,"AWS":0.218,"Node.js":0.221,"PyTorch":0.229,"Power BI":0.229},"soft":{"Critical Thinking":0.496,"Problem Solving":0.491,"Adaptability":0.508,"Communication":0.504,"Leadership":0.502,"Teamwork":0.498},"count":2048},"Machine Learning Engineer":{"tech":{"Node.js":0.229,"ML":0.235,"C++":0.227,"Kubernetes":0.224,"TensorFlow":0.213,"Docker":0.235,"SQL":0.439,"Tableau":0.228,"AWS":0.204,"Power BI":0.221,"NumPy":0.218,"Python":0.454,"Java":0.227,"Pandas":0.221,"React":0.203,"PyTorch":0.222},"soft":{"Adaptability":0.487,"Critical Thinking":0.5,"Communication":0.504,"Teamwork":0.503,"Leadership":0.493,"Problem Solving":0.513},"count":1966},"Statistical Analyst":{"tech":{"Java":0.232,"Node.js":0.238,"Pandas":0.224,"NumPy":0.208,"SQL":0.44,"Python":0.426,"TensorFlow":0.23,"PyTorch":0.218,"Power BI":0.224,"ML":0.23,"Docker":0.226,"AWS":0.232,"Kubernetes":0.223,"React":0.225,"C++":0.217,"Tableau":0.206},"soft":{"Teamwork":0.498,"Leadership":0.493,"Problem Solving":0.491,"Critical Thinking":0.513,"Adaptability":0.505,"Communication":0.5},"count":2037},"Predictive Analyst":{"tech":{"TensorFlow":0.216,"Docker":0.236,"Tableau":0.209,"ML":0.218,"PyTorch":0.21,"Python":0.47,"React":0.21,"Power BI":0.234,"Kubernetes":0.233,"C++":0.229,"AWS":0.226,"Java":0.229,"SQL":0.445,"NumPy":0.225,"Pandas":0.206,"Node.js":0.205},"soft":{"Leadership":0.5,"Critical Thinking":0.52,"Teamwork":0.496,"Adaptability":0.494,"Communication":0.485,"Problem Solving":0.505},"count":2032},"Quantitative Analyst":{"tech":{"Pandas":0.237,"Tableau":0.218,"SQL":0.451,"ML":0.226,"Python":0.446,"React":0.208,"Power BI":0.226,"C++":0.218,"TensorFlow":0.218,"Kubernetes":0.221,"Docker":0.211,"PyTorch":0.213,"NumPy":0.203,"AWS":0.219,"Java":0.245,"Node.js":0.238},"soft":{"Teamwork":0.51,"Adaptability":0.505,"Communication":0.49,"Problem Solving":0.501,"Critical Thinking":0.494,"Leadership":0.501},"count":1964},"Decision Scientist":{"tech":{"Python":0.461,"Tableau":0.221,"SQL":0.446,"ML":0.222,"Power BI":0.217,"Kubernetes":0.209,"Docker":0.22,"Node.js":0.23,"Java":0.223,"AWS":0.214,"C++":0.221,"NumPy":0.228,"Pandas":0.214,"PyTorch":0.218,"TensorFlow":0.227,"React":0.231},"soft":{"Adaptability":0.49,"Leadership":0.485,"Critical Thinking":0.512,"Problem Solving":0.511,"Communication":0.511,"Teamwork":0.491},"count":1985},"AI Research Scientist":{"tech":{"Node.js":0.215,"NumPy":0.231,"Power BI":0.211,"C++":0.227,"SQL":0.455,"Docker":0.221,"Python":0.437,"Java":0.235,"ML":0.229,"PyTorch":0.224,"AWS":0.231,"Kubernetes":0.224,"Pandas":0.219,"TensorFlow":0.214,"Tableau":0.216,"React":0.209},"soft":{"Problem Solving":0.519,"Teamwork":0.502,"Communication":0.515,"Critical Thinking":0.476,"Adaptability":0.497,"Leadership":0.491},"count":2049},"Data Mining Engineer":{"tech":{"Power BI":0.219,"ML":0.233,"AWS":0.224,"Python":0.434,"Java":0.21,"TensorFlow":0.218,"C++":0.211,"SQL":0.436,"Node.js":0.217,"Pandas":0.219,"React":0.222,"Tableau":0.227,"Kubernetes":0.228,"PyTorch":0.235,"NumPy":0.235,"Docker":0.233},"soft":{"Adaptability":0.505,"Communication":0.498,"Problem Solving":0.476,"Leadership":0.524,"Teamwork":0.501,"Critical Thinking":0.496},"count":2023},"AI Engineer":{"tech":{"Pandas":0.228,"Kubernetes":0.219,"SQL":0.449,"NumPy":0.206,"PyTorch":0.229,"Power BI":0.225,"Tableau":0.219,"Python":0.439,"C++":0.216,"React":0.247,"AWS":0.218,"TensorFlow":0.232,"Docker":0.217,"ML":0.236,"Java":0.209,"Node.js":0.212},"soft":{"Adaptability":0.491,"Teamwork":0.501,"Problem Solving":0.501,"Leadership":0.501,"Communication":0.51,"Critical Thinking":0.497},"count":1938},"Fraud Detection Analyst":{"tech":{"C++":0.234,"Node.js":0.222,"SQL":0.463,"Java":0.232,"Python":0.446,"TensorFlow":0.231,"Pandas":0.217,"Power BI":0.217,"React":0.231,"NumPy":0.213,"Docker":0.21,"AWS":0.221,"Tableau":0.215,"ML":0.214,"Kubernetes":0.232,"PyTorch":0.203},"soft":{"Leadership":0.501,"Problem Solving":0.479,"Adaptability":0.506,"Teamwork":0.513,"Communication":0.494,"Critical Thinking":0.507},"count":1947},"Big Data Engineer":{"tech":{"Docker":0.222,"TensorFlow":0.207,"AWS":0.208,"Java":0.227,"React":0.225,"NumPy":0.227,"ML":0.212,"Tableau":0.227,"SQL":0.455,"Python":0.451,"Node.js":0.234,"Kubernetes":0.223,"Power BI":0.215,"C++":0.213,"Pandas":0.23,"PyTorch":0.222},"soft":{"Teamwork":0.487,"Problem Solving":0.51,"Critical Thinking":0.504,"Communication":0.491,"Leadership":0.488,"Adaptability":0.52},"count":2049}}},"CSBS":{"tech_skills":["AWS","C++","Docker","Java","Kubernetes","ML","Node.js","NumPy","Pandas","Power BI","PyTorch","Python","React","SQL","Tableau","TensorFlow"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"Systems Analyst":{"tech":{"PyTorch":0.225,"Tableau":0.22,"C++":0.241,"Node.js":0.227,"SQL":0.428,"TensorFlow":0.211,"React":0.207,"ML":0.237,"Java":0.232,"Kubernetes":0.224,"Python":0.47,"Power BI":0.229,"AWS":0.23,"Pandas":0.205,"Docker":0.201,"NumPy":0.212},"soft":{"Adaptability":0.492,"Teamwork":0.498,"Leadership":0.489,"Critical Thinking":0.496,"Problem Solving":0.503,"Communication":0.522},"count":2006},"Software Developer":{"tech":{"Kubernetes":0.233,"Docker":0.221,"NumPy":0.221,"ML":0.223,"Python":0.446,"React":0.21,"Node.js":0.235,"SQL":0.432,"Power BI":0.224,"PyTorch":0.215,"C++":0.238,"Java":0.212,"Tableau":0.212,"AWS":0.23,"TensorFlow":0.228,"Pandas":0.219},"soft":{"Problem Solving":0.509,"Communication":0.485,"Critical Thinking":0.486,"Adaptability":0.504,"Teamwork":0.508,"Leadership":0.508},"count":2011},"Cloud Consultant":{"tech":{"Pandas":0.23,"C++":0.213,"React":0.219,"TensorFlow":0.209,"AWS":0.228,"ML":0.207,"Power BI":0.212,"Python":0.449,"SQL":0.437,"PyTorch":0.225,"NumPy":0.238,"Node.js":0.225,"Tableau":0.22,"Kubernetes":0.237,"Java":0.224,"Docker":0.224},"soft":{"Communication":0.487,"Critical Thinking":0.516,"Leadership":0.498,"Teamwork":0.498,"Adaptability":0.498,"Problem Solving":0.502},"count":1974},"Business Intelligence Analyst":{"tech":{"Kubernetes":0.206,"Tableau":0.22,"NumPy":0.225,"TensorFlow":0.213,"Python":0.48,"AWS":0.213,"Docker":0.213,"SQL":0.465,"Pandas":0.213,"React":0.217,"Node.js":0.218,"ML":0.21,"C++":0.226,"PyTorch":0.23,"Java":0.229,"Power BI":0.222},"soft":{"Teamwork":0.484,"Leadership":0.514,"Communication":0.498,"Adaptability":0.503,"Problem Solving":0.506,"Critical Thinking":0.494},"count":2089},"FinTech Analyst":{"tech":{"NumPy":0.233,"C++":0.232,"PyTorch":0.219,"Kubernetes":0.218,"SQL":0.433,"React":0.211,"Java":0.228,"Docker":0.209,"Pandas":0.216,"Python":0.441,"ML":0.225,"Node.js":0.213,"Power BI":0.221,"TensorFlow":0.23,"AWS":0.238,"Tableau":0.234},"soft":{"Adaptability":0.507,"Critical Thinking":0.511,"Communication":0.499,"Problem Solving":0.503,"Leadership":0.482,"Teamwork":0.498},"count":2064},"Application Analyst":{"tech":{"C++":0.219,"PyTorch":0.231,"Kubernetes":0.218,"Power BI":0.235,"React":0.223,"Python":0.434,"NumPy":0.228,"SQL":0.466,"Node.js":0.217,"Pandas":0.239,"Java":0.216,"Tableau":0.216,"Docker":0.214,"AWS":0.207,"ML":0.212,"TensorFlow":0.223},"soft":{"Leadership":0.502,"Critical Thinking":0.511,"Communication":0.5,"Problem Solving":0.502,"Adaptability":0.475,"Teamwork":0.51},"count":1960},"Project Manager":{"tech":{"React":0.215,"TensorFlow":0.238,"AWS":0.236,"Node.js":0.226,"NumPy":0.224,"SQL":0.436,"Kubernetes":0.217,"Python":0.427,"Docker":0.206,"Java":0.228,"PyTorch":0.213,"C++":0.236,"Tableau":0.232,"ML":0.233,"Power BI":0.22,"Pandas":0.213},"soft":{"Adaptability":0.504,"Teamwork":0.524,"Problem Solving":0.496,"Critical Thinking":0.514,"Communication":0.493,"Leadership":0.469},"count":1976},"Data Analyst":{"tech":{"Kubernetes":0.231,"Node.js":0.22,"Java":0.229,"React":0.227,"Pandas":0.223,"Tableau":0.233,"SQL":0.434,"PyTorch":0.224,"Python":0.44,"NumPy":0.229,"TensorFlow":0.224,"C++":0.221,"Power BI":0.212,"Docker":0.221,"ML":0.211,"AWS":0.219},"soft":{"Communication":0.507,"Adaptability":0.498,"Teamwork":0.504,"Critical Thinking":0.495,"Problem Solving":0.484,"Leadership":0.512},"count":1983},"Operations Analyst":{"tech":{"PyTorch":0.219,"AWS":0.216,"Docker":0.228,"SQL":0.436,"Python":0.466,"ML":0.213,"Node.js":0.233,"TensorFlow":0.225,"Java":0.222,"Tableau":0.22,"NumPy":0.23,"Pandas":0.225,"C++":0.223,"React":0.214,"Kubernetes":0.214,"Power BI":0.215},"soft":{"Critical Thinking":0.521,"Leadership":0.492,"Problem Solving":0.496,"Teamwork":0.512,"Adaptability":0.487,"Communication":0.492},"count":2028},"Financial Analyst":{"tech":{"Node.js":0.22,"SQL":0.47,"TensorFlow":0.225,"Kubernetes":0.22,"Tableau":0.231,"C++":0.23,"React":0.222,"Docker":0.236,"PyTorch":0.201,"AWS":0.233,"Python":0.419,"ML":0.226,"Power BI":0.219,"Pandas":0.223,"NumPy":0.21,"Java":0.215},"soft":{"Communication":0.498,"Leadership":0.505,"Adaptability":0.5,"Critical Thinking":0.498,"Teamwork":0.503,"Problem Solving":0.496},"count":2028},"Market Analyst":{"tech":{"C++":0.227,"TensorFlow":0.215,"Python":0.433,"Docker":0.246,"Power BI":0.244,"Tableau":0.22,"Java":0.224,"AWS":0.217,"SQL":0.441,"ML":0.214,"PyTorch":0.216,"Kubernetes":0.222,"Pandas":0.222,"NumPy":0.221,"Node.js":0.211,"React":0.226},"soft":{"Critical Thinking":0.482,"Communication":0.487,"Leadership":0.517,"Teamwork":0.506,"Adaptability":0.512,"Problem Solving":0.495},"count":1946},"Data Scientist":{"tech":{"Kubernetes":0.239,"Python":0.443,"ML":0.228,"SQL":0.447,"Tableau":0.202,"Docker":0.217,"Java":0.219,"NumPy":0.234,"PyTorch":0.219,"C++":0.227,"Node.js":0.204,"AWS":0.243,"React":0.216,"Power BI":0.223,"TensorFlow":0.224,"Pandas":0.214},"soft":{"Teamwork":0.493,"Communication":0.498,"Leadership":0.503,"Adaptability":0.499,"Critical Thinking":0.494,"Problem Solving":0.513},"count":1988},"Supply Chain Analyst":{"tech":{"PyTorch":0.237,"Docker":0.223,"Pandas":0.215,"AWS":0.207,"C++":0.231,"ML":0.215,"Node.js":0.227,"Python":0.43,"NumPy":0.243,"SQL":0.437,"TensorFlow":0.228,"Java":0.23,"Kubernetes":0.201,"Tableau":0.222,"React":0.235,"Power BI":0.219},"soft":{"Communication":0.516,"Critical Thinking":0.487,"Teamwork":0.507,"Leadership":0.504,"Adaptability":0.486,"Problem Solving":0.499},"count":1973},"CRM Specialist":{"tech":{"Pandas":0.229,"Power BI":0.213,"Kubernetes":0.232,"Python":0.431,"NumPy":0.213,"AWS":0.22,"C++":0.211,"React":0.232,"TensorFlow":0.227,"Java":0.236,"PyTorch":0.218,"Tableau":0.221,"Docker":0.23,"Node.js":0.219,"SQL":0.429,"ML":0.239},"soft":{"Adaptability":0.481,"Leadership":0.51,"Communication":0.496,"Problem Solving":0.492,"Teamwork":0.508,"Critical Thinking":0.513},"count":2020},"Strategy Analyst":{"tech":{"Tableau":0.229,"SQL":0.432,"Python":0.427,"NumPy":0.216,"React":0.224,"Docker":0.236,"AWS":0.23,"Node.js":0.238,"Java":0.216,"Kubernetes":0.223,"ML":0.225,"Power BI":0.222,"Pandas":0.224,"TensorFlow":0.222,"C++":0.2,"PyTorch":0.234},"soft":{"Problem Solving":0.496,"Adaptability":0.501,"Critical Thinking":0.498,"Teamwork":0.506,"Leadership":0.487,"Communication":0.512},"count":1987},"Tech Consultant":{"tech":{"C++":0.24,"TensorFlow":0.212,"PyTorch":0.224,"NumPy":0.226,"Docker":0.217,"AWS":0.225,"Node.js":0.217,"Power BI":0.197,"ML":0.239,"Python":0.443,"Java":0.21,"Kubernetes":0.224,"Tableau":0.229,"SQL":0.461,"Pandas":0.22,"React":0.215},"soft":{"Critical Thinking":0.491,"Adaptability":0.516,"Communication":0.494,"Problem Solving":0.502,"Teamwork":0.498,"Leadership":0.499},"count":2010},"Digital Transformation Analyst":{"tech":{"SQL":0.446,"Kubernetes":0.229,"Java":0.226,"AWS":0.233,"Node.js":0.237,"Docker":0.214,"C++":0.217,"NumPy":0.203,"Python":0.437,"Tableau":0.226,"React":0.224,"Power BI":0.219,"PyTorch":0.215,"TensorFlow":0.225,"ML":0.228,"Pandas":0.223},"soft":{"Teamwork":0.483,"Communication":0.505,"Adaptability":0.498,"Problem Solving":0.503,"Leadership":0.516,"Critical Thinking":0.496},"count":2037},"IT Consultant":{"tech":{"ML":0.225,"Node.js":0.226,"Kubernetes":0.229,"SQL":0.447,"Pandas":0.22,"C++":0.205,"NumPy":0.22,"PyTorch":0.22,"Docker":0.225,"React":0.22,"Tableau":0.216,"Python":0.442,"AWS":0.229,"TensorFlow":0.227,"Java":0.227,"Power BI":0.223},"soft":{"Communication":0.5,"Adaptability":0.499,"Teamwork":0.502,"Critical Thinking":0.512,"Leadership":0.508,"Problem Solving":0.479},"count":1979},"Product Manager":{"tech":{"SQL":0.45,"React":0.222,"Tableau":0.219,"Java":0.227,"Python":0.437,"Docker":0.222,"PyTorch":0.21,"Node.js":0.202,"ML":0.231,"NumPy":0.217,"Kubernetes":0.223,"TensorFlow":0.216,"C++":0.231,"Pandas":0.23,"AWS":0.225,"Power BI":0.238},"soft":{"Communication":0.49,"Leadership":0.485,"Critical Thinking":0.496,"Problem Solving":0.513,"Adaptability":0.493,"Teamwork":0.523},"count":1962},"Management Consultant":{"tech":{"Docker":0.21,"ML":0.226,"Kubernetes":0.234,"Java":0.223,"C++":0.228,"Tableau":0.208,"Pandas":0.214,"PyTorch":0.229,"TensorFlow":0.234,"Node.js":0.212,"AWS":0.214,"Power BI":0.225,"Python":0.451,"SQL":0.446,"NumPy":0.22,"React":0.227},"soft":{"Teamwork":0.485,"Leadership":0.51,"Problem Solving":0.499,"Adaptability":0.512,"Critical Thinking":0.487,"Communication":0.507},"count":1973},"Product Analyst":{"tech":{"Pandas":0.22,"Python":0.446,"SQL":0.446,"NumPy":0.212,"Docker":0.216,"ML":0.234,"Power BI":0.211,"Node.js":0.251,"Tableau":0.242,"Kubernetes":0.207,"C++":0.215,"React":0.234,"Java":0.201,"AWS":0.236,"PyTorch":0.211,"TensorFlow":0.221},"soft":{"Critical Thinking":0.493,"Communication":0.485,"Problem Solving":0.507,"Leadership":0.492,"Teamwork":0.514,"Adaptability":0.509},"count":1995},"Business Analyst":{"tech":{"SQL":0.443,"Node.js":0.211,"Python":0.442,"AWS":0.229,"Pandas":0.223,"Java":0.221,"ML":0.224,"Docker":0.216,"Power BI":0.218,"PyTorch":0.237,"Kubernetes":0.219,"C++":0.213,"NumPy":0.223,"Tableau":0.229,"TensorFlow":0.215,"React":0.236},"soft":{"Problem Solving":0.508,"Adaptability":0.507,"Leadership":0.5,"Critical Thinking":0.49,"Communication":0.477,"Teamwork":0.518},"count":1942},"ERP Consultant":{"tech":{"Docker":0.243,"NumPy":0.21,"Tableau":0.222,"AWS":0.236,"Node.js":0.22,"Power BI":0.215,"ML":0.219,"SQL":0.449,"C++":0.231,"Kubernetes":0.223,"PyTorch":0.235,"Pandas":0.222,"React":0.219,"Python":0.448,"TensorFlow":0.214,"Java":0.192},"soft":{"Teamwork":0.506,"Adaptability":0.502,"Leadership":0.503,"Communication":0.492,"Critical Thinking":0.503,"Problem Solving":0.493},"count":2068},"Growth Analyst":{"tech":{"Pandas":0.213,"PyTorch":0.222,"AWS":0.225,"Tableau":0.225,"TensorFlow":0.224,"Power BI":0.217,"ML":0.225,"SQL":0.455,"Docker":0.213,"Python":0.449,"Kubernetes":0.219,"Java":0.225,"React":0.223,"NumPy":0.211,"C++":0.221,"Node.js":0.233},"soft":{"Problem Solving":0.521,"Teamwork":0.498,"Leadership":0.501,"Adaptability":0.511,"Communication":0.478,"Critical Thinking":0.491},"count":2025},"Risk Analyst":{"tech":{"Python":0.449,"Java":0.229,"Docker":0.232,"SQL":0.425,"Tableau":0.224,"React":0.206,"Node.js":0.224,"Kubernetes":0.221,"Pandas":0.211,"ML":0.235,"C++":0.238,"PyTorch":0.222,"Power BI":0.2,"TensorFlow":0.219,"NumPy":0.233,"AWS":0.232},"soft":{"Communication":0.49,"Problem Solving":0.489,"Leadership":0.499,"Adaptability":0.512,"Teamwork":0.503,"Critical Thinking":0.507},"count":1976}}},"ECE":{"tech_skills":["ANSYS","AutoCAD","Embedded C","FPGA","MATLAB","PLC","SCADA","SolidWorks","VLSI"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"Automation Engineer":{"tech":{"MATLAB":0.45,"ANSYS":0.443,"FPGA":0.457,"AutoCAD":0.451,"PLC":0.444,"Embedded C":0.434,"SCADA":0.433,"VLSI":0.44,"SolidWorks":0.448},"soft":{"Communication":0.494,"Critical Thinking":0.503,"Teamwork":0.498,"Leadership":0.515,"Adaptability":0.501,"Problem Solving":0.489},"count":1963},"PCB Design Engineer":{"tech":{"FPGA":0.449,"ANSYS":0.432,"PLC":0.452,"SCADA":0.46,"MATLAB":0.438,"Embedded C":0.441,"AutoCAD":0.459,"SolidWorks":0.428,"VLSI":0.441},"soft":{"Communication":0.518,"Teamwork":0.506,"Critical Thinking":0.474,"Adaptability":0.499,"Leadership":0.494,"Problem Solving":0.508},"count":1993},"Avionics Engineer":{"tech":{"FPGA":0.449,"SolidWorks":0.446,"Embedded C":0.442,"PLC":0.43,"VLSI":0.462,"MATLAB":0.451,"SCADA":0.434,"ANSYS":0.432,"AutoCAD":0.456},"soft":{"Leadership":0.52,"Critical Thinking":0.504,"Adaptability":0.497,"Teamwork":0.499,"Problem Solving":0.487,"Communication":0.494},"count":1997},"Instrumentation Engineer":{"tech":{"FPGA":0.444,"ANSYS":0.438,"Embedded C":0.434,"PLC":0.447,"MATLAB":0.451,"SCADA":0.461,"AutoCAD":0.435,"VLSI":0.442,"SolidWorks":0.447},"soft":{"Communication":0.495,"Adaptability":0.493,"Critical Thinking":0.489,"Leadership":0.52,"Problem Solving":0.511,"Teamwork":0.492},"count":2063},"Mechatronics Engineer":{"tech":{"SolidWorks":0.462,"AutoCAD":0.436,"FPGA":0.433,"PLC":0.433,"ANSYS":0.453,"MATLAB":0.433,"Embedded C":0.446,"VLSI":0.453,"SCADA":0.452},"soft":{"Critical Thinking":0.498,"Communication":0.491,"Teamwork":0.495,"Adaptability":0.508,"Problem Solving":0.51,"Leadership":0.498},"count":1973},"Signal Processing Engineer":{"tech":{"VLSI":0.443,"SolidWorks":0.422,"SCADA":0.459,"PLC":0.445,"MATLAB":0.454,"ANSYS":0.443,"AutoCAD":0.437,"FPGA":0.457,"Embedded C":0.44},"soft":{"Communication":0.487,"Critical Thinking":0.506,"Adaptability":0.49,"Leadership":0.492,"Problem Solving":0.507,"Teamwork":0.518},"count":1956},"Satellite Engineer":{"tech":{"VLSI":0.465,"ANSYS":0.454,"MATLAB":0.462,"FPGA":0.432,"SCADA":0.439,"SolidWorks":0.423,"PLC":0.443,"AutoCAD":0.434,"Embedded C":0.447},"soft":{"Critical Thinking":0.492,"Leadership":0.507,"Teamwork":0.502,"Communication":0.506,"Problem Solving":0.493,"Adaptability":0.5},"count":1991},"Chip Design Engineer":{"tech":{"MATLAB":0.46,"SCADA":0.443,"FPGA":0.443,"Embedded C":0.455,"AutoCAD":0.455,"SolidWorks":0.434,"ANSYS":0.444,"PLC":0.43,"VLSI":0.434},"soft":{"Leadership":0.486,"Communication":0.512,"Teamwork":0.523,"Critical Thinking":0.498,"Adaptability":0.48,"Problem Solving":0.501},"count":1998},"Communication Engineer":{"tech":{"VLSI":0.454,"MATLAB":0.447,"AutoCAD":0.442,"PLC":0.453,"ANSYS":0.45,"SolidWorks":0.445,"Embedded C":0.431,"SCADA":0.434,"FPGA":0.444},"soft":{"Communication":0.501,"Leadership":0.486,"Critical Thinking":0.505,"Teamwork":0.5,"Adaptability":0.511,"Problem Solving":0.497},"count":1971},"Embedded Systems Engineer":{"tech":{"SCADA":0.443,"ANSYS":0.462,"PLC":0.434,"MATLAB":0.445,"Embedded C":0.443,"SolidWorks":0.444,"VLSI":0.426,"FPGA":0.45,"AutoCAD":0.452},"soft":{"Leadership":0.51,"Teamwork":0.504,"Adaptability":0.505,"Critical Thinking":0.503,"Communication":0.501,"Problem Solving":0.476},"count":2028},"Network Engineer":{"tech":{"PLC":0.437,"SolidWorks":0.466,"AutoCAD":0.455,"SCADA":0.429,"Embedded C":0.432,"FPGA":0.453,"ANSYS":0.446,"MATLAB":0.432,"VLSI":0.449},"soft":{"Adaptability":0.517,"Teamwork":0.483,"Leadership":0.491,"Communication":0.499,"Problem Solving":0.51,"Critical Thinking":0.501},"count":2005},"IoT Engineer":{"tech":{"VLSI":0.467,"FPGA":0.434,"SCADA":0.442,"AutoCAD":0.449,"MATLAB":0.438,"PLC":0.427,"Embedded C":0.45,"ANSYS":0.454,"SolidWorks":0.439},"soft":{"Problem Solving":0.504,"Adaptability":0.488,"Leadership":0.501,"Teamwork":0.489,"Communication":0.499,"Critical Thinking":0.519},"count":2033},"Control Systems Engineer":{"tech":{"VLSI":0.456,"SolidWorks":0.438,"PLC":0.446,"SCADA":0.433,"ANSYS":0.428,"AutoCAD":0.437,"MATLAB":0.462,"Embedded C":0.445,"FPGA":0.453},"soft":{"Communication":0.509,"Problem Solving":0.508,"Leadership":0.529,"Critical Thinking":0.458,"Teamwork":0.492,"Adaptability":0.503},"count":1987},"RF Engineer":{"tech":{"VLSI":0.428,"FPGA":0.428,"PLC":0.44,"SCADA":0.447,"SolidWorks":0.44,"AutoCAD":0.456,"ANSYS":0.458,"Embedded C":0.449,"MATLAB":0.455},"soft":{"Communication":0.505,"Adaptability":0.494,"Teamwork":0.525,"Leadership":0.502,"Problem Solving":0.51,"Critical Thinking":0.465},"count":1990},"Robotics Engineer":{"tech":{"VLSI":0.415,"FPGA":0.439,"PLC":0.432,"SolidWorks":0.454,"ANSYS":0.442,"Embedded C":0.475,"MATLAB":0.452,"SCADA":0.452,"AutoCAD":0.44},"soft":{"Communication":0.495,"Adaptability":0.507,"Leadership":0.505,"Teamwork":0.5,"Problem Solving":0.492,"Critical Thinking":0.501},"count":2076},"Broadcast Engineer":{"tech":{"PLC":0.448,"AutoCAD":0.434,"ANSYS":0.436,"SCADA":0.453,"FPGA":0.444,"MATLAB":0.433,"Embedded C":0.434,"VLSI":0.458,"SolidWorks":0.459},"soft":{"Critical Thinking":0.481,"Leadership":0.501,"Adaptability":0.501,"Teamwork":0.525,"Problem Solving":0.498,"Communication":0.495},"count":2009},"Optical Engineer":{"tech":{"Embedded C":0.446,"VLSI":0.442,"ANSYS":0.422,"SolidWorks":0.449,"SCADA":0.459,"FPGA":0.428,"PLC":0.44,"MATLAB":0.451,"AutoCAD":0.461},"soft":{"Leadership":0.516,"Adaptability":0.485,"Problem Solving":0.499,"Critical Thinking":0.508,"Communication":0.512,"Teamwork":0.48},"count":1987},"VLSI Design Engineer":{"tech":{"MATLAB":0.446,"Embedded C":0.446,"SCADA":0.437,"AutoCAD":0.446,"VLSI":0.446,"SolidWorks":0.44,"PLC":0.442,"FPGA":0.444,"ANSYS":0.453},"soft":{"Teamwork":0.511,"Leadership":0.487,"Communication":0.491,"Adaptability":0.503,"Critical Thinking":0.505,"Problem Solving":0.503},"count":2024},"FPGA Engineer":{"tech":{"Embedded C":0.455,"MATLAB":0.436,"SCADA":0.444,"ANSYS":0.445,"AutoCAD":0.443,"SolidWorks":0.457,"VLSI":0.422,"PLC":0.434,"FPGA":0.464},"soft":{"Problem Solving":0.499,"Leadership":0.489,"Communication":0.513,"Critical Thinking":0.498,"Teamwork":0.504,"Adaptability":0.497},"count":1969},"Telecom Engineer":{"tech":{"SCADA":0.441,"SolidWorks":0.447,"AutoCAD":0.458,"PLC":0.445,"MATLAB":0.443,"VLSI":0.451,"FPGA":0.445,"Embedded C":0.441,"ANSYS":0.43},"soft":{"Communication":0.481,"Critical Thinking":0.505,"Problem Solving":0.514,"Adaptability":0.494,"Teamwork":0.492,"Leadership":0.514},"count":1957},"Firmware Engineer":{"tech":{"ANSYS":0.447,"Embedded C":0.449,"MATLAB":0.428,"FPGA":0.452,"AutoCAD":0.465,"VLSI":0.457,"SCADA":0.433,"SolidWorks":0.431,"PLC":0.438},"soft":{"Critical Thinking":0.489,"Adaptability":0.51,"Communication":0.495,"Leadership":0.504,"Problem Solving":0.507,"Teamwork":0.494},"count":1936},"Testing Engineer":{"tech":{"Embedded C":0.428,"MATLAB":0.445,"SolidWorks":0.443,"FPGA":0.442,"SCADA":0.445,"VLSI":0.448,"PLC":0.454,"AutoCAD":0.444,"ANSYS":0.452},"soft":{"Leadership":0.513,"Communication":0.508,"Adaptability":0.502,"Problem Solving":0.5,"Teamwork":0.481,"Critical Thinking":0.496},"count":2024},"Hardware Engineer":{"tech":{"SCADA":0.457,"FPGA":0.457,"VLSI":0.437,"Embedded C":0.439,"ANSYS":0.456,"PLC":0.449,"MATLAB":0.439,"AutoCAD":0.439,"SolidWorks":0.428},"soft":{"Critical Thinking":0.506,"Communication":0.494,"Adaptability":0.511,"Leadership":0.512,"Problem Solving":0.511,"Teamwork":0.466},"count":2009},"Electronics Engineer":{"tech":{"MATLAB":0.446,"AutoCAD":0.434,"SCADA":0.457,"VLSI":0.461,"Embedded C":0.458,"SolidWorks":0.438,"ANSYS":0.434,"FPGA":0.431,"PLC":0.441},"soft":{"Critical Thinking":0.493,"Leadership":0.496,"Communication":0.505,"Adaptability":0.503,"Teamwork":0.514,"Problem Solving":0.489},"count":2076},"ASIC Design Engineer":{"tech":{"FPGA":0.453,"SolidWorks":0.434,"MATLAB":0.415,"Embedded C":0.454,"ANSYS":0.442,"SCADA":0.463,"AutoCAD":0.444,"VLSI":0.453,"PLC":0.441},"soft":{"Communication":0.497,"Teamwork":0.502,"Adaptability":0.488,"Leadership":0.497,"Critical Thinking":0.524,"Problem Solving":0.492},"count":1985}}},"Mechanical":{"tech_skills":["ANSYS","AutoCAD","Embedded C","FPGA","MATLAB","PLC","SCADA","SolidWorks","VLSI"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"CNC Programmer":{"tech":{"FPGA":0.453,"Embedded C":0.448,"PLC":0.467,"SCADA":0.431,"SolidWorks":0.448,"AutoCAD":0.432,"VLSI":0.442,"ANSYS":0.443,"MATLAB":0.436},"soft":{"Critical Thinking":0.511,"Problem Solving":0.503,"Communication":0.503,"Leadership":0.479,"Adaptability":0.503,"Teamwork":0.5},"count":1985},"HVAC Engineer":{"tech":{"VLSI":0.456,"Embedded C":0.452,"AutoCAD":0.454,"SolidWorks":0.447,"SCADA":0.442,"PLC":0.432,"MATLAB":0.447,"FPGA":0.446,"ANSYS":0.425},"soft":{"Critical Thinking":0.503,"Adaptability":0.499,"Problem Solving":0.501,"Leadership":0.514,"Communication":0.514,"Teamwork":0.468},"count":1971},"Automotive Engineer":{"tech":{"VLSI":0.437,"SolidWorks":0.445,"Embedded C":0.455,"MATLAB":0.444,"AutoCAD":0.445,"ANSYS":0.442,"SCADA":0.444,"PLC":0.443,"FPGA":0.445},"soft":{"Critical Thinking":0.501,"Adaptability":0.491,"Leadership":0.499,"Problem Solving":0.502,"Teamwork":0.503,"Communication":0.505},"count":1978},"Tool Design Engineer":{"tech":{"ANSYS":0.423,"SolidWorks":0.449,"FPGA":0.444,"AutoCAD":0.445,"Embedded C":0.46,"PLC":0.456,"VLSI":0.43,"MATLAB":0.45,"SCADA":0.444},"soft":{"Problem Solving":0.516,"Communication":0.5,"Critical Thinking":0.511,"Leadership":0.5,"Adaptability":0.494,"Teamwork":0.479},"count":2049},"Welding Engineer":{"tech":{"SCADA":0.458,"FPGA":0.445,"MATLAB":0.441,"VLSI":0.437,"AutoCAD":0.461,"Embedded C":0.44,"ANSYS":0.434,"SolidWorks":0.451,"PLC":0.432},"soft":{"Adaptability":0.487,"Problem Solving":0.51,"Leadership":0.493,"Communication":0.511,"Teamwork":0.506,"Critical Thinking":0.493},"count":1982},"Energy Engineer":{"tech":{"MATLAB":0.449,"SolidWorks":0.442,"ANSYS":0.45,"FPGA":0.456,"SCADA":0.426,"Embedded C":0.449,"PLC":0.444,"AutoCAD":0.434,"VLSI":0.448},"soft":{"Teamwork":0.493,"Critical Thinking":0.51,"Problem Solving":0.507,"Communication":0.51,"Adaptability":0.481,"Leadership":0.5},"count":2027},"Maintenance Engineer":{"tech":{"AutoCAD":0.428,"Embedded C":0.468,"PLC":0.438,"SolidWorks":0.442,"FPGA":0.427,"VLSI":0.451,"ANSYS":0.444,"MATLAB":0.429,"SCADA":0.471},"soft":{"Adaptability":0.496,"Teamwork":0.505,"Leadership":0.495,"Problem Solving":0.509,"Critical Thinking":0.494,"Communication":0.501},"count":2005},"Design Engineer":{"tech":{"ANSYS":0.442,"Embedded C":0.432,"MATLAB":0.441,"AutoCAD":0.435,"PLC":0.454,"SolidWorks":0.433,"FPGA":0.457,"SCADA":0.461,"VLSI":0.445},"soft":{"Leadership":0.483,"Teamwork":0.498,"Critical Thinking":0.503,"Adaptability":0.496,"Communication":0.496,"Problem Solving":0.524},"count":2011},"Plant Engineer":{"tech":{"VLSI":0.44,"FPGA":0.463,"SolidWorks":0.43,"MATLAB":0.45,"ANSYS":0.421,"AutoCAD":0.44,"PLC":0.451,"SCADA":0.45,"Embedded C":0.457},"soft":{"Teamwork":0.496,"Leadership":0.507,"Problem Solving":0.504,"Communication":0.496,"Critical Thinking":0.494,"Adaptability":0.502},"count":1991},"Robotics Engineer":{"tech":{"AutoCAD":0.451,"SCADA":0.455,"SolidWorks":0.427,"Embedded C":0.416,"FPGA":0.442,"PLC":0.453,"MATLAB":0.455,"VLSI":0.454,"ANSYS":0.448},"soft":{"Teamwork":0.504,"Communication":0.484,"Critical Thinking":0.519,"Leadership":0.485,"Adaptability":0.517,"Problem Solving":0.491},"count":1924},"Thermal Engineer":{"tech":{"ANSYS":0.452,"PLC":0.449,"SCADA":0.435,"SolidWorks":0.448,"FPGA":0.463,"MATLAB":0.423,"Embedded C":0.433,"AutoCAD":0.443,"VLSI":0.454},"soft":{"Teamwork":0.496,"Critical Thinking":0.513,"Problem Solving":0.509,"Adaptability":0.515,"Communication":0.481,"Leadership":0.485},"count":2023},"R&D Engineer":{"tech":{"FPGA":0.443,"SCADA":0.447,"PLC":0.445,"SolidWorks":0.447,"AutoCAD":0.452,"Embedded C":0.44,"VLSI":0.435,"MATLAB":0.449,"ANSYS":0.442},"soft":{"Communication":0.514,"Leadership":0.51,"Problem Solving":0.492,"Critical Thinking":0.482,"Teamwork":0.49,"Adaptability":0.512},"count":2045},"Marine Engineer":{"tech":{"VLSI":0.453,"SolidWorks":0.456,"AutoCAD":0.444,"SCADA":0.437,"FPGA":0.448,"PLC":0.464,"MATLAB":0.427,"ANSYS":0.451,"Embedded C":0.421},"soft":{"Adaptability":0.503,"Communication":0.508,"Leadership":0.467,"Critical Thinking":0.502,"Problem Solving":0.504,"Teamwork":0.514},"count":2024},"CAM Engineer":{"tech":{"ANSYS":0.434,"VLSI":0.444,"PLC":0.461,"MATLAB":0.432,"SCADA":0.444,"Embedded C":0.452,"SolidWorks":0.446,"FPGA":0.441,"AutoCAD":0.447},"soft":{"Problem Solving":0.495,"Critical Thinking":0.474,"Teamwork":0.498,"Adaptability":0.502,"Leadership":0.521,"Communication":0.51},"count":1997},"Industrial Engineer":{"tech":{"PLC":0.446,"Embedded C":0.438,"ANSYS":0.45,"MATLAB":0.442,"VLSI":0.442,"AutoCAD":0.438,"SCADA":0.442,"SolidWorks":0.46,"FPGA":0.442},"soft":{"Communication":0.505,"Teamwork":0.487,"Problem Solving":0.502,"Critical Thinking":0.522,"Adaptability":0.498,"Leadership":0.486},"count":2032},"Mechanical Engineer":{"tech":{"ANSYS":0.468,"MATLAB":0.442,"SolidWorks":0.448,"SCADA":0.429,"FPGA":0.457,"AutoCAD":0.432,"VLSI":0.449,"Embedded C":0.433,"PLC":0.441},"soft":{"Teamwork":0.528,"Leadership":0.505,"Adaptability":0.481,"Critical Thinking":0.502,"Communication":0.491,"Problem Solving":0.491},"count":1878},"Pipeline Engineer":{"tech":{"FPGA":0.447,"MATLAB":0.436,"PLC":0.444,"SolidWorks":0.44,"AutoCAD":0.454,"SCADA":0.43,"Embedded C":0.445,"ANSYS":0.451,"VLSI":0.452},"soft":{"Communication":0.505,"Critical Thinking":0.499,"Leadership":0.508,"Teamwork":0.489,"Adaptability":0.493,"Problem Solving":0.506},"count":2007},"Manufacturing Engineer":{"tech":{"Embedded C":0.449,"PLC":0.449,"VLSI":0.458,"MATLAB":0.425,"FPGA":0.45,"AutoCAD":0.451,"ANSYS":0.445,"SCADA":0.434,"SolidWorks":0.438},"soft":{"Communication":0.496,"Leadership":0.513,"Problem Solving":0.499,"Teamwork":0.503,"Adaptability":0.501,"Critical Thinking":0.487},"count":1959},"Aeronautical Engineer":{"tech":{"MATLAB":0.446,"Embedded C":0.443,"AutoCAD":0.454,"FPGA":0.441,"SolidWorks":0.449,"PLC":0.463,"VLSI":0.439,"SCADA":0.433,"ANSYS":0.433},"soft":{"Adaptability":0.496,"Communication":0.489,"Critical Thinking":0.499,"Leadership":0.497,"Problem Solving":0.516,"Teamwork":0.503},"count":2029},"Reliability Engineer":{"tech":{"Embedded C":0.444,"ANSYS":0.441,"AutoCAD":0.435,"PLC":0.456,"SolidWorks":0.445,"SCADA":0.436,"VLSI":0.447,"FPGA":0.449,"MATLAB":0.447},"soft":{"Communication":0.485,"Teamwork":0.521,"Leadership":0.502,"Adaptability":0.503,"Critical Thinking":0.494,"Problem Solving":0.496},"count":1965},"Quality Engineer":{"tech":{"AutoCAD":0.426,"FPGA":0.44,"Embedded C":0.461,"ANSYS":0.45,"SCADA":0.455,"MATLAB":0.447,"PLC":0.451,"SolidWorks":0.434,"VLSI":0.436},"soft":{"Critical Thinking":0.496,"Problem Solving":0.501,"Adaptability":0.511,"Teamwork":0.491,"Leadership":0.509,"Communication":0.493},"count":2010},"CAD Engineer":{"tech":{"PLC":0.45,"VLSI":0.445,"FPGA":0.456,"ANSYS":0.43,"MATLAB":0.428,"SolidWorks":0.444,"AutoCAD":0.438,"SCADA":0.445,"Embedded C":0.465},"soft":{"Problem Solving":0.496,"Adaptability":0.498,"Leadership":0.494,"Critical Thinking":0.492,"Communication":0.495,"Teamwork":0.523},"count":2067},"Project Engineer":{"tech":{"VLSI":0.465,"FPGA":0.43,"SolidWorks":0.434,"ANSYS":0.457,"Embedded C":0.434,"PLC":0.467,"SCADA":0.448,"AutoCAD":0.438,"MATLAB":0.425},"soft":{"Critical Thinking":0.507,"Teamwork":0.514,"Problem Solving":0.49,"Leadership":0.504,"Communication":0.505,"Adaptability":0.48},"count":2007},"Mechatronics Engineer":{"tech":{"VLSI":0.434,"MATLAB":0.448,"PLC":0.462,"SCADA":0.46,"ANSYS":0.448,"SolidWorks":0.437,"FPGA":0.435,"AutoCAD":0.436,"Embedded C":0.44},"soft":{"Leadership":0.507,"Communication":0.488,"Adaptability":0.512,"Teamwork":0.507,"Critical Thinking":0.496,"Problem Solving":0.491},"count":2041},"Production Engineer":{"tech":{"ANSYS":0.426,"Embedded C":0.445,"FPGA":0.44,"MATLAB":0.436,"PLC":0.448,"SCADA":0.431,"VLSI":0.449,"SolidWorks":0.452,"AutoCAD":0.473},"soft":{"Teamwork":0.521,"Adaptability":0.481,"Communication":0.512,"Leadership":0.486,"Critical Thinking":0.485,"Problem Solving":0.515},"count":1993}}},"EEE":{"tech_skills":["ANSYS","AutoCAD","Embedded C","FPGA","MATLAB","PLC","SCADA","SolidWorks","VLSI"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"Electrical Testing Engineer":{"tech":{"FPGA":0.452,"MATLAB":0.445,"SolidWorks":0.454,"VLSI":0.447,"AutoCAD":0.43,"PLC":0.438,"Embedded C":0.457,"ANSYS":0.429,"SCADA":0.449},"soft":{"Problem Solving":0.495,"Communication":0.503,"Critical Thinking":0.503,"Teamwork":0.494,"Leadership":0.514,"Adaptability":0.492},"count":1961},"Protection Engineer":{"tech":{"ANSYS":0.437,"MATLAB":0.428,"PLC":0.443,"FPGA":0.445,"SCADA":0.445,"AutoCAD":0.446,"VLSI":0.454,"SolidWorks":0.458,"Embedded C":0.442},"soft":{"Adaptability":0.498,"Communication":0.517,"Critical Thinking":0.475,"Problem Solving":0.492,"Teamwork":0.495,"Leadership":0.524},"count":2046},"EV Engineer":{"tech":{"SCADA":0.451,"MATLAB":0.437,"PLC":0.448,"Embedded C":0.435,"VLSI":0.467,"SolidWorks":0.426,"ANSYS":0.453,"AutoCAD":0.438,"FPGA":0.447},"soft":{"Leadership":0.508,"Adaptability":0.5,"Problem Solving":0.505,"Critical Thinking":0.511,"Communication":0.493,"Teamwork":0.484},"count":2013},"Transmission Engineer":{"tech":{"AutoCAD":0.448,"SCADA":0.449,"FPGA":0.435,"ANSYS":0.449,"VLSI":0.44,"SolidWorks":0.431,"Embedded C":0.445,"PLC":0.464,"MATLAB":0.44},"soft":{"Leadership":0.488,"Teamwork":0.518,"Communication":0.493,"Problem Solving":0.514,"Adaptability":0.509,"Critical Thinking":0.477},"count":1981},"Power Systems Engineer":{"tech":{"MATLAB":0.443,"FPGA":0.44,"AutoCAD":0.433,"PLC":0.436,"Embedded C":0.441,"ANSYS":0.435,"VLSI":0.459,"SCADA":0.462,"SolidWorks":0.45},"soft":{"Communication":0.489,"Adaptability":0.495,"Critical Thinking":0.514,"Leadership":0.482,"Teamwork":0.502,"Problem Solving":0.518},"count":2021},"Embedded Engineer":{"tech":{"Embedded C":0.448,"PLC":0.447,"MATLAB":0.435,"FPGA":0.437,"AutoCAD":0.442,"ANSYS":0.45,"SCADA":0.439,"SolidWorks":0.455,"VLSI":0.448},"soft":{"Leadership":0.5,"Problem Solving":0.501,"Adaptability":0.489,"Teamwork":0.509,"Communication":0.477,"Critical Thinking":0.524},"count":1967},"Instrumentation Engineer":{"tech":{"SolidWorks":0.452,"MATLAB":0.439,"ANSYS":0.453,"Embedded C":0.422,"SCADA":0.434,"PLC":0.468,"VLSI":0.445,"AutoCAD":0.443,"FPGA":0.445},"soft":{"Problem Solving":0.512,"Communication":0.48,"Adaptability":0.5,"Teamwork":0.494,"Critical Thinking":0.504,"Leadership":0.511},"count":2018},"Solar Engineer":{"tech":{"Embedded C":0.436,"FPGA":0.43,"AutoCAD":0.448,"SCADA":0.449,"SolidWorks":0.43,"ANSYS":0.471,"VLSI":0.458,"MATLAB":0.447,"PLC":0.431},"soft":{"Adaptability":0.502,"Teamwork":0.505,"Problem Solving":0.49,"Critical Thinking":0.492,"Communication":0.498,"Leadership":0.513},"count":1984},"Robotics Engineer":{"tech":{"ANSYS":0.46,"VLSI":0.446,"FPGA":0.43,"AutoCAD":0.471,"SolidWorks":0.434,"PLC":0.43,"Embedded C":0.454,"SCADA":0.454,"MATLAB":0.421},"soft":{"Teamwork":0.483,"Problem Solving":0.501,"Critical Thinking":0.498,"Adaptability":0.513,"Leadership":0.503,"Communication":0.501},"count":2012},"Energy Auditor":{"tech":{"MATLAB":0.436,"SolidWorks":0.449,"ANSYS":0.435,"VLSI":0.437,"FPGA":0.44,"Embedded C":0.45,"SCADA":0.456,"PLC":0.45,"AutoCAD":0.447},"soft":{"Adaptability":0.505,"Critical Thinking":0.51,"Problem Solving":0.499,"Communication":0.488,"Leadership":0.499,"Teamwork":0.499},"count":1999},"Electrical Design Engineer":{"tech":{"SolidWorks":0.439,"MATLAB":0.439,"AutoCAD":0.449,"Embedded C":0.451,"PLC":0.433,"FPGA":0.444,"VLSI":0.458,"ANSYS":0.429,"SCADA":0.458},"soft":{"Teamwork":0.512,"Critical Thinking":0.495,"Problem Solving":0.509,"Communication":0.498,"Adaptability":0.48,"Leadership":0.505},"count":2059},"Power Electronics Engineer":{"tech":{"AutoCAD":0.438,"MATLAB":0.466,"FPGA":0.441,"ANSYS":0.44,"Embedded C":0.449,"PLC":0.445,"VLSI":0.454,"SolidWorks":0.432,"SCADA":0.435},"soft":{"Communication":0.504,"Teamwork":0.484,"Leadership":0.502,"Critical Thinking":0.514,"Adaptability":0.49,"Problem Solving":0.506},"count":2011},"PLC Engineer":{"tech":{"VLSI":0.45,"MATLAB":0.448,"Embedded C":0.438,"ANSYS":0.44,"SolidWorks":0.46,"FPGA":0.428,"PLC":0.438,"SCADA":0.458,"AutoCAD":0.44},"soft":{"Teamwork":0.484,"Leadership":0.505,"Adaptability":0.514,"Critical Thinking":0.503,"Communication":0.508,"Problem Solving":0.487},"count":1976},"SCADA Engineer":{"tech":{"PLC":0.458,"FPGA":0.428,"ANSYS":0.449,"MATLAB":0.452,"SolidWorks":0.433,"AutoCAD":0.447,"SCADA":0.46,"VLSI":0.438,"Embedded C":0.436},"soft":{"Problem Solving":0.495,"Leadership":0.496,"Adaptability":0.518,"Teamwork":0.494,"Critical Thinking":0.492,"Communication":0.506},"count":2034},"Control Systems Engineer":{"tech":{"AutoCAD":0.457,"SCADA":0.429,"FPGA":0.442,"ANSYS":0.437,"VLSI":0.448,"Embedded C":0.444,"PLC":0.442,"SolidWorks":0.43,"MATLAB":0.472},"soft":{"Communication":0.496,"Leadership":0.528,"Problem Solving":0.489,"Teamwork":0.504,"Adaptability":0.491,"Critical Thinking":0.493},"count":2020},"Distribution Engineer":{"tech":{"AutoCAD":0.465,"SCADA":0.44,"PLC":0.424,"ANSYS":0.453,"MATLAB":0.453,"Embedded C":0.437,"VLSI":0.449,"FPGA":0.436,"SolidWorks":0.444},"soft":{"Problem Solving":0.509,"Communication":0.5,"Critical Thinking":0.495,"Adaptability":0.493,"Leadership":0.499,"Teamwork":0.505},"count":2020},"Lighting Engineer":{"tech":{"VLSI":0.44,"FPGA":0.452,"PLC":0.437,"SolidWorks":0.447,"AutoCAD":0.456,"Embedded C":0.444,"ANSYS":0.442,"SCADA":0.438,"MATLAB":0.445},"soft":{"Adaptability":0.522,"Teamwork":0.492,"Problem Solving":0.478,"Communication":0.488,"Critical Thinking":0.515,"Leadership":0.505},"count":1972},"Electrical Supervisor":{"tech":{"PLC":0.464,"SolidWorks":0.442,"MATLAB":0.44,"SCADA":0.443,"FPGA":0.439,"VLSI":0.455,"AutoCAD":0.438,"Embedded C":0.429,"ANSYS":0.45},"soft":{"Adaptability":0.516,"Problem Solving":0.487,"Leadership":0.521,"Critical Thinking":0.489,"Communication":0.51,"Teamwork":0.478},"count":1932},"Renewable Energy Engineer":{"tech":{"MATLAB":0.446,"ANSYS":0.474,"AutoCAD":0.417,"PLC":0.446,"SCADA":0.427,"VLSI":0.463,"FPGA":0.446,"Embedded C":0.433,"SolidWorks":0.447},"soft":{"Communication":0.495,"Adaptability":0.519,"Teamwork":0.512,"Critical Thinking":0.492,"Problem Solving":0.503,"Leadership":0.479},"count":1891},"Wind Energy Engineer":{"tech":{"PLC":0.461,"ANSYS":0.429,"Embedded C":0.433,"MATLAB":0.446,"FPGA":0.447,"SolidWorks":0.456,"VLSI":0.439,"SCADA":0.443,"AutoCAD":0.446},"soft":{"Problem Solving":0.49,"Leadership":0.495,"Communication":0.497,"Teamwork":0.514,"Adaptability":0.501,"Critical Thinking":0.502},"count":2009},"Grid Engineer":{"tech":{"PLC":0.438,"MATLAB":0.458,"FPGA":0.453,"SolidWorks":0.446,"AutoCAD":0.457,"VLSI":0.435,"Embedded C":0.429,"ANSYS":0.423,"SCADA":0.46},"soft":{"Problem Solving":0.513,"Communication":0.495,"Critical Thinking":0.511,"Leadership":0.484,"Teamwork":0.496,"Adaptability":0.5},"count":1985},"Maintenance Engineer":{"tech":{"ANSYS":0.433,"SCADA":0.45,"FPGA":0.431,"MATLAB":0.454,"VLSI":0.443,"SolidWorks":0.448,"Embedded C":0.432,"AutoCAD":0.449,"PLC":0.459},"soft":{"Problem Solving":0.474,"Critical Thinking":0.511,"Communication":0.514,"Leadership":0.484,"Adaptability":0.519,"Teamwork":0.498},"count":2029},"Automation Engineer":{"tech":{"MATLAB":0.46,"SCADA":0.44,"SolidWorks":0.453,"AutoCAD":0.455,"Embedded C":0.423,"ANSYS":0.45,"FPGA":0.436,"PLC":0.438,"VLSI":0.444},"soft":{"Adaptability":0.513,"Teamwork":0.492,"Leadership":0.496,"Problem Solving":0.504,"Critical Thinking":0.49,"Communication":0.505},"count":2029},"Electrical Engineer":{"tech":{"SolidWorks":0.45,"PLC":0.442,"FPGA":0.45,"MATLAB":0.445,"ANSYS":0.457,"SCADA":0.433,"VLSI":0.437,"AutoCAD":0.43,"Embedded C":0.458},"soft":{"Problem Solving":0.502,"Critical Thinking":0.501,"Communication":0.512,"Adaptability":0.489,"Leadership":0.501,"Teamwork":0.495},"count":2011},"Substation Engineer":{"tech":{"FPGA":0.467,"MATLAB":0.421,"SCADA":0.451,"PLC":0.442,"VLSI":0.459,"ANSYS":0.433,"SolidWorks":0.443,"AutoCAD":0.44,"Embedded C":0.444},"soft":{"Teamwork":0.516,"Adaptability":0.515,"Communication":0.497,"Problem Solving":0.503,"Leadership":0.475,"Critical Thinking":0.495},"count":2020}}},"Civil":{"tech_skills":["ANSYS","AutoCAD","Embedded C","FPGA","MATLAB","PLC","SCADA","SolidWorks","VLSI"],"soft_skills":["Adaptability","Communication","Critical Thinking","Leadership","Problem Solving","Teamwork"],"jobs":{"Bridge Engineer":{"tech":{"VLSI":0.445,"ANSYS":0.453,"MATLAB":0.443,"Embedded C":0.449,"SolidWorks":0.453,"SCADA":0.446,"FPGA":0.437,"AutoCAD":0.434,"PLC":0.441},"soft":{"Teamwork":0.507,"Critical Thinking":0.493,"Problem Solving":0.499,"Communication":0.503,"Adaptability":0.488,"Leadership":0.51},"count":1972},"Geotechnical Engineer":{"tech":{"AutoCAD":0.442,"SolidWorks":0.456,"Embedded C":0.446,"MATLAB":0.44,"SCADA":0.425,"ANSYS":0.433,"FPGA":0.446,"PLC":0.458,"VLSI":0.454},"soft":{"Adaptability":0.485,"Critical Thinking":0.497,"Communication":0.506,"Teamwork":0.503,"Problem Solving":0.52,"Leadership":0.489},"count":2029},"Building Engineer":{"tech":{"Embedded C":0.459,"PLC":0.429,"ANSYS":0.44,"SolidWorks":0.454,"SCADA":0.434,"AutoCAD":0.442,"FPGA":0.44,"VLSI":0.45,"MATLAB":0.451},"soft":{"Communication":0.505,"Leadership":0.501,"Critical Thinking":0.475,"Adaptability":0.503,"Teamwork":0.512,"Problem Solving":0.504},"count":2030},"Contracts Engineer":{"tech":{"VLSI":0.44,"AutoCAD":0.43,"MATLAB":0.441,"Embedded C":0.451,"PLC":0.454,"ANSYS":0.456,"SCADA":0.443,"FPGA":0.463,"SolidWorks":0.422},"soft":{"Adaptability":0.503,"Critical Thinking":0.493,"Teamwork":0.5,"Leadership":0.501,"Problem Solving":0.505,"Communication":0.498},"count":1983},"Design Engineer":{"tech":{"SolidWorks":0.453,"PLC":0.446,"SCADA":0.447,"FPGA":0.438,"Embedded C":0.451,"ANSYS":0.442,"AutoCAD":0.447,"MATLAB":0.426,"VLSI":0.45},"soft":{"Adaptability":0.474,"Problem Solving":0.498,"Leadership":0.49,"Communication":0.502,"Teamwork":0.519,"Critical Thinking":0.517},"count":1922},"Field Engineer":{"tech":{"AutoCAD":0.434,"SCADA":0.438,"MATLAB":0.438,"Embedded C":0.45,"FPGA":0.454,"PLC":0.451,"SolidWorks":0.444,"VLSI":0.452,"ANSYS":0.44},"soft":{"Critical Thinking":0.519,"Leadership":0.486,"Adaptability":0.484,"Communication":0.527,"Teamwork":0.483,"Problem Solving":0.501},"count":2020},"Infrastructure Engineer":{"tech":{"MATLAB":0.456,"PLC":0.429,"Embedded C":0.43,"VLSI":0.459,"FPGA":0.442,"SCADA":0.435,"SolidWorks":0.464,"AutoCAD":0.437,"ANSYS":0.447},"soft":{"Leadership":0.502,"Communication":0.494,"Adaptability":0.476,"Teamwork":0.538,"Problem Solving":0.491,"Critical Thinking":0.498},"count":1984},"Estimation Engineer":{"tech":{"ANSYS":0.443,"Embedded C":0.464,"FPGA":0.432,"SCADA":0.443,"AutoCAD":0.452,"SolidWorks":0.422,"VLSI":0.45,"PLC":0.454,"MATLAB":0.44},"soft":{"Problem Solving":0.501,"Teamwork":0.488,"Communication":0.501,"Adaptability":0.506,"Leadership":0.518,"Critical Thinking":0.488},"count":2073},"Planning Engineer":{"tech":{"Embedded C":0.434,"SCADA":0.451,"FPGA":0.447,"PLC":0.437,"VLSI":0.446,"AutoCAD":0.437,"ANSYS":0.445,"SolidWorks":0.452,"MATLAB":0.451},"soft":{"Leadership":0.512,"Problem Solving":0.506,"Critical Thinking":0.499,"Teamwork":0.497,"Adaptability":0.497,"Communication":0.488},"count":2075},"Survey Engineer":{"tech":{"FPGA":0.436,"MATLAB":0.435,"Embedded C":0.437,"ANSYS":0.452,"VLSI":0.447,"PLC":0.429,"SolidWorks":0.471,"SCADA":0.45,"AutoCAD":0.443},"soft":{"Problem Solving":0.507,"Adaptability":0.477,"Leadership":0.521,"Critical Thinking":0.497,"Teamwork":0.508,"Communication":0.49},"count":1986},"Civil Engineer":{"tech":{"PLC":0.443,"AutoCAD":0.435,"ANSYS":0.454,"MATLAB":0.456,"FPGA":0.432,"SolidWorks":0.438,"Embedded C":0.441,"SCADA":0.453,"VLSI":0.448},"soft":{"Leadership":0.489,"Teamwork":0.509,"Problem Solving":0.5,"Communication":0.495,"Adaptability":0.507,"Critical Thinking":0.501},"count":1960},"Quality Control Engineer":{"tech":{"MATLAB":0.436,"PLC":0.437,"SolidWorks":0.45,"FPGA":0.44,"VLSI":0.44,"AutoCAD":0.467,"ANSYS":0.429,"SCADA":0.437,"Embedded C":0.464},"soft":{"Teamwork":0.518,"Problem Solving":0.496,"Critical Thinking":0.497,"Adaptability":0.517,"Leadership":0.49,"Communication":0.482},"count":2040},"Project Engineer":{"tech":{"VLSI":0.449,"ANSYS":0.446,"AutoCAD":0.454,"SCADA":0.425,"FPGA":0.442,"PLC":0.441,"SolidWorks":0.454,"Embedded C":0.449,"MATLAB":0.44},"soft":{"Leadership":0.473,"Problem Solving":0.49,"Adaptability":0.496,"Communication":0.515,"Critical Thinking":0.515,"Teamwork":0.511},"count":1972},"Safety Engineer":{"tech":{"Embedded C":0.443,"PLC":0.455,"VLSI":0.455,"MATLAB":0.432,"ANSYS":0.46,"FPGA":0.443,"SCADA":0.46,"SolidWorks":0.423,"AutoCAD":0.428},"soft":{"Teamwork":0.498,"Communication":0.507,"Leadership":0.513,"Adaptability":0.493,"Problem Solving":0.514,"Critical Thinking":0.475},"count":1940},"Structural Engineer":{"tech":{"FPGA":0.447,"Embedded C":0.45,"AutoCAD":0.458,"SCADA":0.462,"SolidWorks":0.421,"PLC":0.45,"ANSYS":0.426,"VLSI":0.445,"MATLAB":0.44},"soft":{"Problem Solving":0.48,"Teamwork":0.511,"Critical Thinking":0.499,"Communication":0.5,"Adaptability":0.497,"Leadership":0.513},"count":2061},"Water Resources Engineer":{"tech":{"SCADA":0.468,"MATLAB":0.446,"PLC":0.418,"VLSI":0.454,"AutoCAD":0.468,"ANSYS":0.439,"FPGA":0.441,"SolidWorks":0.433,"Embedded C":0.433},"soft":{"Problem Solving":0.499,"Adaptability":0.504,"Critical Thinking":0.522,"Teamwork":0.496,"Leadership":0.479,"Communication":0.5},"count":2009},"Maintenance Engineer":{"tech":{"MATLAB":0.448,"AutoCAD":0.449,"FPGA":0.45,"ANSYS":0.448,"PLC":0.447,"VLSI":0.439,"Embedded C":0.423,"SolidWorks":0.451,"SCADA":0.447},"soft":{"Problem Solving":0.515,"Leadership":0.49,"Communication":0.506,"Critical Thinking":0.495,"Teamwork":0.497,"Adaptability":0.496},"count":2060},"Environmental Engineer":{"tech":{"AutoCAD":0.422,"FPGA":0.456,"MATLAB":0.447,"SCADA":0.437,"SolidWorks":0.455,"ANSYS":0.441,"VLSI":0.449,"Embedded C":0.439,"PLC":0.457},"soft":{"Communication":0.508,"Adaptability":0.494,"Leadership":0.494,"Teamwork":0.502,"Problem Solving":0.5,"Critical Thinking":0.502},"count":2002},"Urban Planner":{"tech":{"PLC":0.445,"ANSYS":0.456,"VLSI":0.442,"FPGA":0.439,"AutoCAD":0.435,"Embedded C":0.454,"MATLAB":0.46,"SolidWorks":0.427,"SCADA":0.44},"soft":{"Problem Solving":0.512,"Adaptability":0.497,"Critical Thinking":0.502,"Teamwork":0.488,"Leadership":0.513,"Communication":0.488},"count":2005},"Site Engineer":{"tech":{"AutoCAD":0.451,"Embedded C":0.451,"ANSYS":0.462,"PLC":0.419,"VLSI":0.44,"MATLAB":0.447,"FPGA":0.428,"SolidWorks":0.434,"SCADA":0.47},"soft":{"Leadership":0.498,"Teamwork":0.506,"Communication":0.5,"Problem Solving":0.497,"Adaptability":0.51,"Critical Thinking":0.489},"count":1980},"Transportation Engineer":{"tech":{"MATLAB":0.435,"FPGA":0.441,"PLC":0.445,"ANSYS":0.464,"AutoCAD":0.46,"Embedded C":0.434,"SolidWorks":0.449,"VLSI":0.447,"SCADA":0.424},"soft":{"Teamwork":0.477,"Adaptability":0.505,"Communication":0.491,"Leadership":0.521,"Critical Thinking":0.494,"Problem Solving":0.513},"count":1904},"Construction Manager":{"tech":{"Embedded C":0.437,"SolidWorks":0.448,"ANSYS":0.455,"FPGA":0.433,"VLSI":0.446,"MATLAB":0.447,"SCADA":0.428,"AutoCAD":0.463,"PLC":0.444},"soft":{"Communication":0.504,"Leadership":0.502,"Adaptability":0.482,"Teamwork":0.491,"Problem Solving":0.53,"Critical Thinking":0.491},"count":1939},"Quantity Surveyor":{"tech":{"AutoCAD":0.458,"Embedded C":0.45,"PLC":0.447,"ANSYS":0.437,"SolidWorks":0.446,"SCADA":0.43,"MATLAB":0.45,"VLSI":0.431,"FPGA":0.451},"soft":{"Teamwork":0.526,"Leadership":0.481,"Critical Thinking":0.498,"Communication":0.498,"Problem Solving":0.504,"Adaptability":0.493},"count":2009},"Highway Engineer":{"tech":{"Embedded C":0.44,"SCADA":0.446,"PLC":0.455,"VLSI":0.435,"ANSYS":0.454,"AutoCAD":0.452,"SolidWorks":0.428,"FPGA":0.45,"MATLAB":0.44},"soft":{"Teamwork":0.513,"Adaptability":0.516,"Critical Thinking":0.503,"Communication":0.489,"Problem Solving":0.473,"Leadership":0.507},"count":2047},"Irrigation Engineer":{"tech":{"VLSI":0.438,"SolidWorks":0.443,"MATLAB":0.444,"Embedded C":0.442,"ANSYS":0.438,"FPGA":0.452,"PLC":0.456,"SCADA":0.436,"AutoCAD":0.451},"soft":{"Communication":0.493,"Problem Solving":0.512,"Teamwork":0.506,"Critical Thinking":0.507,"Leadership":0.484,"Adaptability":0.498},"count":1998}}}};
+
+// ─────────────────────────────────────────────────────────────
+// CAREER KNOWLEDGE BASE
+// ─────────────────────────────────────────────────────────────
+const CAREER_INFO = {
+  default: {
+    certs: ["Domain-specific certification courses (Coursera/Udemy)", "Industry-recognized certifications", "Online bootcamp programs"],
+    projects: ["Build a portfolio project using your top skills", "Contribute to open-source projects", "Create a GitHub portfolio", "Develop a capstone project"],
+    roadmap: ["Build strong foundation in core skills", "Complete relevant certifications", "Work on 2-3 portfolio projects", "Apply for internships or entry-level roles", "Network on LinkedIn"],
+    jobs: ["Junior roles in your chosen domain", "Internship → Full-time conversion", "Freelancing to build experience", "Startup opportunities for faster growth"]
+  },
+  "Full Stack Developer": { certs:["MERN Stack certification","AWS Solutions Architect","Docker & Kubernetes fundamentals"], projects:["Build a full-stack e-commerce app","Create a real-time chat application","Deploy a SaaS product on AWS"], roadmap:["Master React & Node.js","Learn databases (SQL + MongoDB)","Get cloud deployment experience","Build a portfolio of 3+ projects","Apply to product companies"], jobs:["Full Stack Developer","Web Application Engineer","Software Engineer – Full Stack","MERN Stack Developer"] },
+  "Data Scientist": { certs:["Google Data Analytics Certificate","IBM Data Science Professional","Kaggle competitions"], projects:["End-to-end ML pipeline on Kaggle","Sentiment analysis NLP project","Predictive analytics dashboard"], roadmap:["Master Python, Pandas, NumPy","Learn ML algorithms (scikit-learn)","Get comfortable with SQL & visualization","Complete at least 3 Kaggle projects","Apply to analytics / data roles"], jobs:["Data Scientist","ML Engineer","Research Analyst","Data Analyst (entry level)"] },
+  "Machine Learning Engineer": { certs:["DeepLearning.AI TensorFlow Developer","AWS Machine Learning Specialty","Google Professional ML Engineer"], projects:["Build an image classifier","Deploy an ML API with FastAPI","Create a recommendation system"], roadmap:["Master Python + ML fundamentals","Learn TensorFlow / PyTorch","Understand MLOps and deployment","Build end-to-end ML projects","Target AI/ML teams in product companies"], jobs:["ML Engineer","AI Developer","Research Scientist (junior)","Data Engineer"] },
+  "DevOps Engineer": { certs:["Docker Certified Associate","Certified Kubernetes Administrator","AWS DevOps Engineer Professional"], projects:["Set up a CI/CD pipeline","Deploy microservices on Kubernetes","Automate infrastructure with Terraform"], roadmap:["Learn Linux fundamentals","Master Docker & Kubernetes","Practice CI/CD with GitHub Actions","Get cloud certification (AWS/GCP)","Target DevOps / SRE roles"], jobs:["DevOps Engineer","Site Reliability Engineer","Cloud Engineer","Platform Engineer"] },
+  "Cybersecurity Analyst": { certs:["CompTIA Security+","CEH (Certified Ethical Hacker)","OSCP (Offensive Security)"], projects:["Build a home lab for pen testing","CTF (Capture The Flag) competitions","Create a security monitoring dashboard"], roadmap:["Learn networking fundamentals","Master Linux and scripting","Practice ethical hacking (TryHackMe)","Get Security+ certification","Apply to SOC analyst or pen tester roles"], jobs:["Security Analyst","SOC Analyst","Penetration Tester","Information Security Engineer"] },
+  "Embedded Systems Engineer": { certs:["ARM Embedded Systems","RTOS fundamentals","Certified Embedded Systems Engineer (CESE)"], projects:["Build a smart sensor with Arduino/Raspberry Pi","Implement RTOS-based task scheduler","IoT-based home automation system"], roadmap:["Master C/Embedded C","Learn RTOS and microcontroller programming","Practice with dev boards (STM32, ESP32)","Build hardware + software projects","Target automotive / IoT companies"], jobs:["Embedded Software Engineer","Firmware Engineer","IoT Developer","RTOS Programmer"] },
+  "Structural Engineer": { certs:["AutoCAD Certified Professional","ANSYS Structural Simulation","PMP (Project Management Professional)"], projects:["Bridge load analysis project","Structural design using STAAD.Pro","FEM analysis with ANSYS"], roadmap:["Master AutoCAD and STAAD.Pro","Learn structural analysis fundamentals","Get internship in construction firm","Build a portfolio of design projects","Target infrastructure / construction companies"], jobs:["Structural Engineer","Civil Design Engineer","Project Engineer","Site Engineer"] },
+  "Power Systems Engineer": { certs:["MATLAB/Simulink for Power Systems","AutoCAD Electrical Certified","IEEE Power & Energy Society certifications"], projects:["Power flow analysis simulation","Design a solar grid system","PLC-based industrial automation"], roadmap:["Master MATLAB and SCADA tools","Learn power electronics fundamentals","Practice with simulation software","Get internship in power sector","Target utilities / energy companies"], jobs:["Power Systems Engineer","Electrical Design Engineer","Energy Consultant","Control Systems Engineer"] }
+};
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let state = { name:'', dept:'', cgpa:0, techSelected:[], softSelected:[], results:[] };
+
+// ─────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function doLogin() {
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value.trim();
+  if (!u || !p) { alert('Please enter username and password'); return; }
+  showPage('studentPage');
+}
+
+function updateCgpaHint() {
+  const cgpa = parseFloat(document.getElementById('studentCgpa').value) || 0;
+  const hint = document.getElementById('cgpaHint');
+  const dot = document.getElementById('cgpaDot');
+  const txt = document.getElementById('cgpaHintText');
+  hint.style.display = 'flex';
+  if (cgpa >= 8.5) { dot.style.background='#34d399'; txt.textContent='Excellent CGPA! Your recommendations will show high confidence scores.'; }
+  else if (cgpa >= 7.5) { dot.style.background='#4f8cff'; txt.textContent='Good CGPA. Solid recommendations across most career paths.'; }
+  else if (cgpa >= 6.5) { dot.style.background='#fbbf24'; txt.textContent='Average CGPA. Skill-matching will be the primary factor for you.'; }
+  else if (cgpa > 0) { dot.style.background='#f87171'; txt.textContent='Lower CGPA detected. Strong skills can still lead to great opportunities!'; }
+}
+
+document.getElementById('studentCgpa').addEventListener('input', updateCgpaHint);
+
+function goToSkills() {
+  const name = document.getElementById('studentName').value.trim();
+  const dept = document.getElementById('studentDept').value;
+  const cgpa = parseFloat(document.getElementById('studentCgpa').value);
+  if (!name) { alert('Please enter your name'); return; }
+  if (!dept) { alert('Please select your department'); return; }
+  if (!cgpa || cgpa < 0 || cgpa > 10) { alert('Please enter a valid CGPA (0–10)'); return; }
+  state.name = name; state.dept = dept; state.cgpa = cgpa;
+  state.techSelected = []; state.softSelected = [];
+
+  // Fill header
+  document.getElementById('headerName').textContent = name;
+  document.getElementById('headerDept').textContent = dept;
+  document.getElementById('headerCgpa').textContent = cgpa;
+
+  // Fill chips
+  const deptData = CAREER_DATA[dept];
+  const techDiv = document.getElementById('techChips');
+  const softDiv = document.getElementById('softChips');
+  techDiv.innerHTML = '';
+  softDiv.innerHTML = '';
+
+  deptData.tech_skills.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'skill-chip';
+    chip.textContent = s;
+    chip.onclick = () => toggleSkill(chip, s, 'tech');
+    techDiv.appendChild(chip);
+  });
+
+  deptData.soft_skills.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'skill-chip';
+    chip.textContent = s;
+    chip.onclick = () => toggleSkill(chip, s, 'soft');
+    softDiv.appendChild(chip);
+  });
+
+  updateCounts();
+  showPage('skillsPage');
+}
+
+function toggleSkill(chip, skill, type) {
+  if (type === 'tech') {
+    const idx = state.techSelected.indexOf(skill);
+    if (idx === -1) { state.techSelected.push(skill); chip.classList.add('selected'); }
+    else { state.techSelected.splice(idx, 1); chip.classList.remove('selected'); }
+  } else {
+    const idx = state.softSelected.indexOf(skill);
+    if (idx === -1) { state.softSelected.push(skill); chip.classList.add('selected-soft'); }
+    else { state.softSelected.splice(idx, 1); chip.classList.remove('selected-soft'); }
+  }
+  updateCounts();
+}
+
+function updateCounts() {
+  document.getElementById('techCount').textContent = state.techSelected.length + ' selected';
+  document.getElementById('softCount').textContent = state.softSelected.length + ' selected';
+  document.getElementById('predictBtn').disabled = (state.techSelected.length === 0 && state.softSelected.length === 0);
+}
+
+// ─────────────────────────────────────────────────────────────
+// SCORING ALGORITHM
+// ─────────────────────────────────────────────────────────────
+function predict() {
+  const deptData = CAREER_DATA[state.dept];
+  const jobs = deptData.jobs;
+  const totalSkillCount = deptData.tech_skills.length + deptData.soft_skills.length;
+  const cgpaMult = state.cgpa >= 8.5 ? 1.12 : state.cgpa >= 7.5 ? 1.06 : state.cgpa >= 6.5 ? 1.0 : 0.94;
+
+  const scores = Object.entries(jobs).map(([jobName, jobData]) => {
+    let techScore = 0, softScore = 0;
+    state.techSelected.forEach(s => { if (jobData.tech[s]) techScore += jobData.tech[s]; });
+    state.softSelected.forEach(s => { if (jobData.soft[s]) softScore += jobData.soft[s]; });
+
+    // Normalize
+    const maxTech = Object.values(jobData.tech).sort((a,b)=>b-a).slice(0, Math.max(state.techSelected.length, 1)).reduce((a,b)=>a+b, 0) || 1;
+    const maxSoft = Object.values(jobData.soft).sort((a,b)=>b-a).slice(0, Math.max(state.softSelected.length, 1)).reduce((a,b)=>a+b, 0) || 1;
+
+    const techNorm = state.techSelected.length > 0 ? techScore / maxTech : 0;
+    const softNorm = state.softSelected.length > 0 ? softScore / maxSoft : 0;
+
+    const w = state.techSelected.length > 0 && state.softSelected.length > 0 ? 0.65 : (state.techSelected.length > 0 ? 1.0 : 0);
+    const rawScore = (w * techNorm + (1-w) * softNorm) * cgpaMult;
+
+    return { name: jobName, score: rawScore };
+  });
+
+  scores.sort((a,b) => b.score - a.score);
+  const top = scores.slice(0,3);
+
+  // Scale to percentages (max = 95%)
+  const maxRaw = top[0].score;
+  const results = top.map((r, i) => ({
+    name: r.name,
+    pct: Math.round(Math.min(95, (r.score / maxRaw) * (95 - i*8))),
+    score: r.score
+  }));
+
+  state.results = results;
+  renderResults(results);
+  showPage('resultsPage');
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER RESULTS
+// ─────────────────────────────────────────────────────────────
+function renderResults(results) {
+  document.getElementById('resultsSubtitle').textContent =
+    `${state.name} · ${state.dept} · CGPA ${state.cgpa} · ${state.techSelected.length} tech + ${state.softSelected.length} soft skills selected`;
+
+  // Top 3 cards
+  const labels = ['🥇 Primary Recommendation', '🥈 Secondary Option', '🥉 Alternative Path'];
+  const grid = document.getElementById('top3Grid');
+  grid.innerHTML = '';
+  results.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'match-card' + (i===0?' primary':'');
+    card.innerHTML = `
+      <div class="match-rank">${labels[i]}</div>
+      <div class="match-title">${r.name}</div>
+      <div class="match-pct">${r.pct}%</div>
+      <div class="match-score-bar"><div class="match-score-fill" style="width:0%" id="bar${i}"></div></div>
+      <div class="match-score-label"><span>Match Score</span><span>Based on ${state.techSelected.length + state.softSelected.length} skills</span></div>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => { document.getElementById('bar'+i).style.width = r.pct + '%'; }, 100 + i*150);
+  });
+
+  // Primary career detail
+  const primary = results[0];
+  const info = CAREER_INFO[primary.name] || CAREER_INFO.default;
+  const pd = document.getElementById('primaryDetail');
+  pd.innerHTML = `
+    <div class="primary-detail">
+      <div class="pd-header">
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">⭐ Primary Career</div>
+          <div class="pd-title">${primary.name}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="pd-pct">${primary.pct}%</div>
+          <div style="font-size:11px;color:var(--muted);">Match confidence</div>
+        </div>
+      </div>
+      <div class="pd-sections">
+        <div class="pd-section">
+          <div class="pd-section-title">✅ Why This Career?</div>
+          <ul>
+            <li>Strong skill alignment: ${state.techSelected.slice(0,3).join(', ')||'your selected skills'} match well</li>
+            <li>Your ${state.dept} background is directly relevant to this role</li>
+            <li>CGPA of ${state.cgpa} ${state.cgpa >= 7.5 ? 'strengthens' : 'is acceptable for'} your profile</li>
+            <li>High demand for ${primary.name}s in the current job market</li>
+          </ul>
+        </div>
+        <div class="pd-section">
+          <div class="pd-section-title">🏅 Recommended Certifications</div>
+          <ul>${info.certs.map(c=>`<li>${c}</li>`).join('')}</ul>
+        </div>
+        <div class="pd-section">
+          <div class="pd-section-title">📁 Suggested Projects</div>
+          <ul>${info.projects.map(p=>`<li>${p}</li>`).join('')}</ul>
+        </div>
+        <div class="pd-section">
+          <div class="pd-section-title">🗺️ How to Get This Job?</div>
+          <ul>${info.roadmap.map(r=>`<li>${r}</li>`).join('')}</ul>
+        </div>
+        <div class="pd-section" style="grid-column: 1 / -1; border-bottom:none;">
+          <div class="pd-section-title">💼 Job Roles to Apply</div>
+          <ul>${info.jobs.map(j=>`<li>${j}</li>`).join('')}</ul>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Tree structure
+  const tree = document.getElementById('treeSection');
+  tree.innerHTML = `
+    <div class="tree-section">
+      <h3>🌳 Career Path Tree — ${state.name}</h3>
+      <div class="tree">
+        <div class="tree-node">
+          <div class="tree-root">
+            <span style="font-size:18px;">🎓</span>
+            <div>
+              <div class="tree-root-label">${state.name}</div>
+              <div style="font-size:11px;color:var(--muted);">${state.dept} · CGPA ${state.cgpa}</div>
+            </div>
+          </div>
+          <div class="tree-children">
+            ${results.map((r, i) => `
+              <div class="tree-branch">
+                <div class="tree-connector">${i < results.length-1 ? '├─' : '└─'}</div>
+                <div class="tree-leaf">
+                  <div class="tree-leaf-title">${['🥇 Primary','🥈 Secondary','🥉 Alternative'][i]} · ${r.pct}% match</div>
+                  <div style="font-weight:700;color:var(--text);margin-bottom:8px;font-size:13px;">${r.name}</div>
+
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getTopSkills(jobName, dept) {
+  const job = CAREER_DATA[dept].jobs[jobName];
+  if (!job) return [];
+  const allSkills = {...job.tech};
+  return Object.entries(allSkills).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k])=>k);
+}
+</script>
+</body>
+</html>
