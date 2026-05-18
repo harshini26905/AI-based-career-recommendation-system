@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Career Path Recommendation System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #4f8cff;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --danger: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+  }
+
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: flex; flex-direction: column; }
+
+  /* LOGIN */
+  #loginPage {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 20% 50%, #1a2a4a 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, #1a1040 0%, transparent 50%),
+                var(--bg);
+  }
+
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .brand { text-align: center; margin-bottom: 36px; }
+  .brand-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 26px;
+  }
+  .brand h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+  .brand p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,140,255,0.12); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* STUDENT PAGE */
+  #studentPage {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at 70% 30%, #1a1040 0%, transparent 50%), var(--bg);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .card-header { margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(79,140,255,0.12);
+    border: 1px solid rgba(79,140,255,0.3);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .card-header h2 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: #fff; line-height: 1.2; }
+  .card-header p { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+  .select-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    transition: border-color 0.2s;
+  }
+  .select-input:focus { border-color: var(--accent); }
+  .select-input option { background: var(--surface2); }
+
+  /* SKILLS PAGE */
+  #skillsPage { background: var(--bg); padding: 0; }
+
+  .skills-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .skills-header-left h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; }
+
+  .student-info-badge { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .info-chip { background: var(--surface2); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; font-size: 12px; color: var(--muted); }
+  .info-chip span { color: var(--text); font-weight: 600; }
+
+  .skills-body { padding: 32px 40px; max-width: 900px; margin: 0 auto; width: 100%; }
+  .skills-section { margin-bottom: 40px; }
+
+  .skills-section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .skills-section h3 .count-badge {
+    background: rgba(79,140,255,0.15);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .skill-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .skill-chip {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+    color: var(--text);
+  }
+
+  .skill-chip:hover { border-color: var(--accent); background: rgba(79,140,255,0.06); color: #fff; }
+  .skill-chip.selected { background: rgba(79,140,255,0.18); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .skill-chip.selected-soft { background: rgba(167,139,250,0.18); border-color: var(--accent2); color: var(--accent2); font-weight: 600; }
+
+  .btn-predict {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 16px 32px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: block;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.03em;
+  }
+  .btn-predict:hover { opacity: 0.9; }
+  .btn-predict:active { transform: scale(0.99); }
+  .btn-predict:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .predict-footer { padding: 16px 40px 40px; max-width: 900px; margin: 0 auto; width: 100%; }
+
+  /* RESULTS PAGE */
+  #resultsPage { background: var(--bg); }
+
+  .results-header {
+    background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .results-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(79,140,255,0.12) 0%, transparent 70%);
+  }
+
+  .results-header h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #fff; }
+  .results-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  .results-body { max-width: 940px; margin: 0 auto; padding: 36px 40px; width: 100%; }
+
+  .top3-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 36px; }
+
+  @media (max-width: 700px) {
+    .top3-grid { grid-template-columns: 1fr; }
+    .skills-header { padding: 20px; flex-direction: column; align-items: flex-start; }
+    .skills-body, .predict-footer { padding: 20px; }
+    .results-body { padding: 20px; }
+    .results-header { padding: 24px 20px; }
+    .card { padding: 28px 24px; }
+    .login-box { padding: 36px 28px; }
+  }
+
+  .match-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .match-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .match-card.primary { border-color: var(--accent); background: linear-gradient(135deg, rgba(79,140,255,0.08) 0%, var(--surface) 100%); }
+
+  .match-rank { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .match-card.primary .match-rank { color: var(--accent); }
+  .match-card:not(.primary) .match-rank { color: var(--muted); }
+
+  .match-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.3; }
+
+  .match-score-bar { height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+  .match-score-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .match-card.primary .match-score-fill { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .match-card:nth-child(2) .match-score-fill { background: linear-gradient(90deg, var(--accent2), #ec4899); }
+  .match-card:nth-child(3) .match-score-fill { background: linear-gradient(90deg, var(--accent3), #06b6d4); }
+
+  .match-score-label { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+  .match-pct { font-weight: 700; font-size: 18px; font-family: 'Syne', sans-serif; }
+  .match-card.primary .match-pct { color: var(--accent); }
+
+  .primary-detail { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 28px; }
+  .pd-header { background: linear-gradient(135deg, rgba(79,140,255,0.1), rgba(167,139,250,0.08)); border-bottom: 1px solid var(--border); padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .pd-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #fff; }
+  .pd-pct { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--accent); }
+
+  .pd-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media (max-width: 640px) { .pd-sections { grid-template-columns: 1fr; } .top3-grid { grid-template-columns: 1fr; } }
+
+  .pd-section { padding: 24px 28px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .pd-section:nth-child(even) { border-right: none; }
+  .pd-section:nth-last-child(-n+2) { border-bottom: none; }
+
+  .pd-section-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; }
+  .pd-section ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .pd-section ul li { font-size: 13px; color: var(--text); padding-left: 16px; position: relative; line-height: 1.5; }
+  .pd-section ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+  .tree-section { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; }
+  .tree-section h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 20px; }
+  .tree { font-family: monospace; }
+  .tree-root { display: flex; align-items: center; gap: 12px; background: rgba(79,140,255,0.08); border: 1px solid rgba(79,140,255,0.2); border-radius: 12px; padding: 14px 18px; margin-bottom: 12px; width: fit-content; }
+  .tree-root-label { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: #fff; }
+  .tree-children { padding-left: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .tree-branch { display: flex; align-items: flex-start; gap: 10px; }
+  .tree-connector { color: var(--muted); font-size: 16px; padding-top: 14px; white-space: nowrap; }
+  .tree-leaf { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; flex: 1; }
+  .tree-leaf-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .tree-leaf-items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tree-tag { background: rgba(79,140,255,0.1); border: 1px solid rgba(79,140,255,0.2); color: var(--accent); padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+
+  .results-nav { display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+  .results-nav button { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--muted); padding: 10px 20px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .results-nav button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cgpa-hint { display: none; align-items: center; gap: 8px; margin-top: 8px; padding: 10px 14px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); }
+  .cgpa-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cgpa-hint-text { font-size: 12px; color: var(--muted); }
+
+  .dept-badge { display: inline-block; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--accent3); padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+
+  .back-btn {
+    position: fixed;
+    top: 18px; left: 18px;
+    z-index: 999;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 18px;
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.08); }
+  .back-btn.visible { display: flex; }
+</style>
+</head>
+<body>
+
+<!-- GLOBAL BACK BUTTON -->
+<button class="back-btn" id="backBtn" onclick="goBack()">&#8592;</button>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page active">
+  <div class="login-box">
+    <div class="brand">
+      <div class="brand-icon">🎯</div>
+      <h1>CareerPath AI</h1>
+      <p>Smart career recommendations powered by AI</p>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;margin-bottom:24px;background:var(--surface2);border-radius:10px;padding:4px;">
+      <button id="tabLogin" onclick="switchTab('login')" style="flex:1;padding:10px;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;transition:all 0.2s;">Sign In</button>
+      <button id="tabSignup" onclick="switchTab('signup')" style="flex:1;padding:10px;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all 0.2s;">Sign Up</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="Enter your email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password">
+      </div>
+      <div id="loginError" style="display:none;color:var(--danger);font-size:13px;margin-bottom:12px;padding:10px 14px;background:rgba(248,113,113,0.1);border-radius:8px;border:1px solid rgba(248,113,113,0.3);"></div>
+      <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+      <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted);">No account? <span onclick="switchTab('signup')" style="color:var(--accent);cursor:pointer;font-weight:600;">Create one →</span></p>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" style="display:none;">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signupName" class="form-input" placeholder="Enter your full name">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="signupEmail" class="form-input" placeholder="Enter your email (e.g. abc@gmail.com)">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signupPassword" class="form-input" placeholder="Create a password">
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="signupConfirm" class="form-input" placeholder="Re-enter password">
+      </div>
+      <div id="signupError" style="display:none;color:var(--danger);font-size:13px;margin-bottom:12px;padding:10px 14px;background:rgba(248,113,113,0.1);border-radius:8px;border:1px solid rgba(248,113,113,0.3);"></div>
+      <div id="signupSuccess" style="display:none;color:var(--accent3);font-size:13px;margin-bottom:12px;padding:10px 14px;background:rgba(52,211,153,0.1);border-radius:8px;border:1px solid rgba(52,211,153,0.3);"></div>
+      <button class="btn-primary" onclick="doSignup()">Create Account →</button>
+      <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted);">Already have an account? <span onclick="switchTab('login')" style="color:var(--accent);cursor:pointer;font-weight:600;">Sign in →</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage" class="page">
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+    <div>
+      <div style="font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">🛡️ Admin Panel</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;">Registered Users</h2>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;color:var(--muted);">Total Users: <span id="adminUserCount" style="color:var(--text);font-weight:700;">0</span></div>
+      <div style="background:rgba(79,140,255,0.08);border:1px solid rgba(79,140,255,0.25);border-radius:10px;padding:8px 16px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px;">
+        <div>📧 <span style="color:var(--accent);font-weight:600;" id="adminShowEmail"></span></div>
+        <div>🔑 <span style="color:var(--accent2);font-weight:600;" id="adminShowPass"></span></div>
+      </div>
+      <button onclick="startOver()" style="background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.4);border-radius:10px;color:var(--danger);padding:10px 20px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Logout</button>
+    </div>
+  </div>
+  <div style="max-width:1000px;margin:0 auto;padding:32px 40px;width:100%;">
+    <div id="adminUserList"></div>
+  </div>
+</div>
+
+<!-- STUDENT INFO PAGE -->
+<div id="studentPage" class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">📋 Step 1 of 3</div>
+      <h2>Your Academic Profile</h2>
+      <p>We'll use this to tailor your career recommendations</p>
+    </div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="studentName" class="form-input" placeholder="Enter your full name">
+    </div>
+    <div class="form-group">
+      <label>Department</label>
+      <select id="studentDept" class="select-input">
+        <option value="">— Select your department —</option>
+        <option value="CSE">Computer Science Engineering (CSE)</option>
+        <option value="AIDS">AI & Data Science (AI/DS)</option>
+        <option value="CSBS">CS & Business Systems (CSBS)</option>
+        <option value="IT">Information Technology (IT)</option>
+        <option value="ECE">Electronics & Communication (ECE)</option>
+        <option value="EEE">Electrical & Electronics (EEE)</option>
+        <option value="Mechanical">Mechanical Engineering</option>
+        <option value="Civil">Civil Engineering</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>CGPA (0 – 10)</label>
+      <input type="number" id="studentCgpa" class="form-input" placeholder="e.g. 8.5" min="0" max="10" step="0.01">
+      <div class="cgpa-hint" id="cgpaHint">
+        <div class="cgpa-dot" id="cgpaDot"></div>
+        <span class="cgpa-hint-text" id="cgpaHintText"></span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="goToSkills()" style="margin-top:8px;">Continue → Select Skills</button>
+  </div>
+</div>
+
+<!-- SKILLS PAGE -->
+<div id="skillsPage" class="page">
+  <div class="skills-header">
+    <div class="skills-header-left">
+      <h2>🎯 Select Your Skills</h2>
+      <div class="student-info-badge">
+        <div class="info-chip">Name: <span id="headerName"></span></div>
+        <div class="info-chip">Dept: <span id="headerDept"></span></div>
+        <div class="info-chip">CGPA: <span id="headerCgpa"></span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="info-chip">Tech: <span id="techCount">0 selected</span></div>
+      <div class="info-chip">Soft: <span id="softCount">0 selected</span></div>
+    </div>
+  </div>
+
+  <div class="skills-body">
+    <div class="skills-section">
+      <h3>⚙️ Technical Skills <span class="count-badge" id="techBadge"></span></h3>
+      <div class="skill-chips" id="techChips"></div>
+    </div>
+    <div class="skills-section">
+      <h3>🤝 Soft Skills <span class="count-badge" id="softBadge"></span></h3>
+      <div class="skill-chips" id="softChips"></div>
+    </div>
+  </div>
+
+  <div class="predict-footer">
+    <button class="btn-predict" id="predictBtn" onclick="predict()" disabled>
+      🔮 Predict My Career Path
+    </button>
+  </div>
+</div>
+
+<!-- RESULTS PAGE -->
+<div id="resultsPage" class="page">
+  <div class="results-header">
+    <h2>🎓 Your Career Recommendations</h2>
+    <p id="resultsSubtitle"></p>
+  </div>
+  <div class="results-body">
+    <div class="top3-grid" id="top3Grid"></div>
+    <div id="primaryDetail"></div>
+    <div id="treeSection"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CAREER DATA — All 8 departments with correct skills & 50+/35+ jobs
+// ═══════════════════════════════════════════════════════════════
+const CAREER_DATA = {
+
+  // ─── CSE ── 50 jobs ────────────────────────────────────────
+  "CSE": {
+    tech_skills: ["Python","Java","C++","JavaScript","TypeScript","React","Node.js","Angular","SQL","MongoDB","PostgreSQL","AWS","Azure","Docker","Kubernetes","Git","REST API","GraphQL","TensorFlow","PyTorch","Machine Learning","Data Structures","Linux","CI/CD","Microservices"],
+    soft_skills: ["Problem Solving","Critical Thinking","Communication","Teamwork","Adaptability","Leadership","Time Management","Creativity","Attention to Detail","Work Ethic"],
+    jobs: {
+      "Software Engineer":         mkj({Python:5,Java:5,"C++":4,JavaScript:4,"Data Structures":5,Git:4,SQL:4,"REST API":4},{Problem_Solving:5,Teamwork:4,Communication:4,Critical_Thinking:5}),
+      "Full Stack Developer":      mkj({JavaScript:5,React:5,"Node.js":5,SQL:4,MongoDB:4,AWS:3,Docker:3,"REST API":5},{Creativity:4,Teamwork:4,Problem_Solving:4,Communication:4}),
+      "Frontend Developer":        mkj({JavaScript:5,React:5,TypeScript:4,Angular:3,CSS:3,"REST API":4,Git:4},{Creativity:5,Attention_to_Detail:5,Communication:4,Teamwork:4}),
+      "Backend Developer":         mkj({Python:5,Java:5,"Node.js":4,SQL:5,PostgreSQL:4,MongoDB:3,Docker:4,"REST API":5,"Microservices":4},{Problem_Solving:5,Teamwork:4,Critical_Thinking:4}),
+      "Machine Learning Engineer": mkj({Python:5,TensorFlow:5,PyTorch:4,"Machine Learning":5,SQL:4,AWS:3,Docker:3,"Data Structures":4},{Critical_Thinking:5,Problem_Solving:5,Adaptability:4}),
+      "Data Scientist":            mkj({Python:5,"Machine Learning":5,TensorFlow:4,SQL:5,PyTorch:4,AWS:3,"Data Structures":4},{Critical_Thinking:5,Problem_Solving:5,Communication:4}),
+      "Data Analyst":              mkj({Python:4,SQL:5,"Machine Learning":3,Java:2,AWS:3,PostgreSQL:4},{Critical_Thinking:5,Communication:4,Attention_to_Detail:5}),
+      "DevOps Engineer":           mkj({Docker:5,Kubernetes:5,AWS:5,"CI/CD":5,Linux:4,Python:4,Git:4,"Microservices":4},{Problem_Solving:5,Adaptability:5,Teamwork:4}),
+      "Cloud Engineer":            mkj({AWS:5,Azure:4,Docker:4,Kubernetes:5,Linux:4,"CI/CD":4,Python:3},{Adaptability:5,Problem_Solving:4,Critical_Thinking:4}),
+      "Cybersecurity Analyst":     mkj({Linux:5,Python:4,"C++":3,SQL:3,AWS:4,Docker:3,Git:3},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:5,Adaptability:4}),
+      "Site Reliability Engineer": mkj({Linux:5,Docker:5,Kubernetes:5,Python:4,"CI/CD":5,AWS:4,Git:4},{Problem_Solving:5,Adaptability:5,Critical_Thinking:4}),
+      "Ethical Hacker":            mkj({Linux:5,Python:4,"C++":3,SQL:3,AWS:3,"REST API":3},{Problem_Solving:5,Adaptability:5,Critical_Thinking:5,Attention_to_Detail:5}),
+      "Database Administrator":    mkj({SQL:5,PostgreSQL:5,MongoDB:4,Python:3,AWS:3,Linux:4},{Attention_to_Detail:5,Problem_Solving:5,Teamwork:3,Critical_Thinking:4}),
+      "System Engineer":           mkj({Linux:5,Docker:4,Kubernetes:4,Python:4,AWS:4,"C++":3,Git:4},{Problem_Solving:5,Critical_Thinking:4,Adaptability:4}),
+      "Platform Engineer":         mkj({Docker:5,Kubernetes:5,"CI/CD":5,AWS:4,Python:4,Git:4,"Microservices":4},{Adaptability:5,Problem_Solving:4,Critical_Thinking:4}),
+      "Mobile App Developer":      mkj({JavaScript:4,React:3,Java:4,TypeScript:4,"REST API":4,SQL:3,Git:4},{Creativity:5,Problem_Solving:4,Attention_to_Detail:4}),
+      "Game Developer":            mkj({"C++":5,JavaScript:3,Python:3,SQL:2,"Data Structures":5},{Creativity:5,Problem_Solving:5,Attention_to_Detail:4,Teamwork:4}),
+      "API Developer":             mkj({"REST API":5,GraphQL:5,Python:4,Java:4,Node_js:4,SQL:4,Docker:3},{Problem_Solving:5,Attention_to_Detail:4,Teamwork:4}),
+      "AR/VR Developer":           mkj({JavaScript:4,Python:3,"C++":4,"Machine Learning":3,React:3},{Creativity:5,Problem_Solving:4,Adaptability:4}),
+      "Blockchain Developer":      mkj({JavaScript:4,Python:4,"C++":3,SQL:3,Docker:3},{Critical_Thinking:5,Problem_Solving:5,Adaptability:4}),
+      "AI Engineer":               mkj({Python:5,TensorFlow:5,PyTorch:5,"Machine Learning":5,SQL:4,Docker:4,AWS:4},{Critical_Thinking:5,Problem_Solving:5,Adaptability:5}),
+      "Web Developer":             mkj({JavaScript:5,React:4,"Node.js":4,SQL:3,HTML:4,CSS:4,"REST API":4},{Creativity:4,Communication:4,Problem_Solving:4}),
+      "Software Tester (QA)":      mkj({Python:4,Java:3,SQL:4,Git:4,"REST API":3,Docker:3},{Attention_to_Detail:5,Critical_Thinking:5,Problem_Solving:4,Communication:4}),
+      "Automation Engineer":       mkj({Python:5,Java:4,SQL:4,Docker:4,Git:4,"CI/CD":4,"REST API":4},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:4}),
+      "Cloud Architect":           mkj({AWS:5,Azure:5,Docker:5,Kubernetes:5,"Microservices":5,"CI/CD":4,Python:4},{Leadership:5,Critical_Thinking:5,Problem_Solving:5}),
+      "Data Engineer":             mkj({Python:5,SQL:5,PostgreSQL:4,MongoDB:4,AWS:4,Docker:4,"Data Structures":4},{Problem_Solving:5,Teamwork:4,Critical_Thinking:4}),
+      "NLP Engineer":              mkj({Python:5,TensorFlow:4,PyTorch:4,"Machine Learning":5,SQL:3},{Critical_Thinking:5,Problem_Solving:5,Adaptability:4}),
+      "Deep Learning Engineer":    mkj({Python:5,TensorFlow:5,PyTorch:5,"Machine Learning":5,"Data Structures":4,GPU:3},{Critical_Thinking:5,Problem_Solving:5,Adaptability:5}),
+      "Computer Vision Engineer":  mkj({Python:5,TensorFlow:4,PyTorch:4,"Machine Learning":5,"C++":4},{Critical_Thinking:5,Problem_Solving:5,Adaptability:4}),
+      "Software Architect":        mkj({"Microservices":5,Docker:5,Java:5,Python:4,SQL:4,AWS:5,Git:5},{Leadership:5,Critical_Thinking:5,Communication:5,Problem_Solving:5}),
+      "Tech Lead":                 mkj({Java:5,Python:4,"Microservices":5,Docker:4,SQL:4,Git:5,AWS:4},{Leadership:5,Communication:5,Teamwork:5,Critical_Thinking:5}),
+      "Product Manager (Tech)":    mkj({SQL:4,Python:3,"REST API":3,AWS:3,Git:3},{Communication:5,Leadership:5,Critical_Thinking:5,Teamwork:5}),
+      "Scrum Master":              mkj({Git:4,SQL:2,Python:2,"CI/CD":3},{Communication:5,Leadership:4,Teamwork:5,Adaptability:5}),
+      "Solutions Architect":       mkj({AWS:5,Azure:4,Docker:4,Kubernetes:4,"Microservices":5,SQL:4,Python:4},{Leadership:5,Communication:5,Critical_Thinking:5}),
+      "Security Engineer":         mkj({Linux:5,Python:4,"C++":3,SQL:4,AWS:4,Docker:4,Kubernetes:3},{Problem_Solving:5,Critical_Thinking:5,Attention_to_Detail:5,Adaptability:4}),
+      "MLOps Engineer":            mkj({Python:5,"Machine Learning":4,Docker:5,Kubernetes:5,"CI/CD":5,AWS:4,Git:4},{Problem_Solving:5,Adaptability:5,Critical_Thinking:4}),
+      "Embedded Software Engineer":mkj({"C++":5,Python:3,Linux:4,"Data Structures":5,Git:4},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:4}),
+      "Firmware Engineer":         mkj({"C++":5,Python:3,Linux:4,Assembly:4,"Data Structures":4},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "IoT Developer":             mkj({Python:4,"C++":4,JavaScript:3,"REST API":4,AWS:4,SQL:3,Docker:3},{Problem_Solving:5,Creativity:4,Adaptability:4}),
+      "Robotics Software Engineer":mkj({Python:5,"C++":5,"Machine Learning":4,TensorFlow:3,Linux:5,"Data Structures":5},{Problem_Solving:5,Critical_Thinking:5,Teamwork:4}),
+      "Network Engineer":          mkj({Linux:5,Python:4,AWS:4,SQL:3,Docker:3},{Problem_Solving:5,Adaptability:4,Attention_to_Detail:4}),
+      "IT Consultant":             mkj({SQL:4,Python:3,AWS:4,Azure:3,Docker:3,"REST API":3},{Communication:5,Leadership:4,Critical_Thinking:5,Adaptability:4}),
+      "Business Intelligence Dev": mkj({SQL:5,Python:4,PostgreSQL:4,"Machine Learning":3,AWS:3},{Attention_to_Detail:5,Communication:4,Problem_Solving:4,Critical_Thinking:4}),
+      "Data Architect":            mkj({SQL:5,MongoDB:4,PostgreSQL:5,AWS:5,Python:4,Docker:4,"Microservices":4},{Leadership:5,Critical_Thinking:5,Problem_Solving:5}),
+      "Quantitative Analyst":      mkj({Python:5,SQL:5,"Machine Learning":4,TensorFlow:3,PostgreSQL:4},{Critical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Algorithm Engineer":        mkj({"Data Structures":5,Python:5,"C++":5,Java:4,"Machine Learning":3},{Problem_Solving:5,Critical_Thinking:5,Attention_to_Detail:5}),
+      "Digital Forensics Analyst": mkj({Linux:5,Python:4,SQL:4,"C++":3,Git:3},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:5,Adaptability:4}),
+      "Cloud Security Engineer":   mkj({AWS:5,Azure:4,Docker:5,Linux:5,Python:4,Kubernetes:4},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Penetration Tester":        mkj({Linux:5,Python:5,"C++":4,SQL:3,AWS:3,Docker:3},{Problem_Solving:5,Critical_Thinking:5,Adaptability:5,Attention_to_Detail:5}),
+      "Technical Program Manager": mkj({SQL:3,Python:3,"CI/CD":4,Git:4,AWS:3},{Leadership:5,Communication:5,Teamwork:5,Critical_Thinking:4}),
+    }
+  },
+
+  // ─── AI/DS ── 50 jobs ──────────────────────────────────────
+  "AIDS": {
+    tech_skills: ["Python","R","SQL","TensorFlow","PyTorch","Keras","Scikit-Learn","Pandas","NumPy","Matplotlib","Tableau","Power BI","AWS","Azure","GCP","Spark","Hadoop","MongoDB","Docker","Kubernetes","Machine Learning","Deep Learning","NLP","Computer Vision","Statistics"],
+    soft_skills: ["Analytical Thinking","Problem Solving","Communication","Critical Thinking","Teamwork","Curiosity","Attention to Detail","Work Ethic","Adaptability","Leadership"],
+    jobs: {
+      "Data Scientist":              mkj({Python:5,SQL:5,"Machine Learning":5,TensorFlow:4,Pandas:5,NumPy:4,"Statistics":5,Tableau:3},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:5}),
+      "Machine Learning Engineer":   mkj({Python:5,TensorFlow:5,PyTorch:5,"Machine Learning":5,"Deep Learning":5,Docker:4,Kubernetes:4,AWS:4},{Problem_Solving:5,Critical_Thinking:5,Adaptability:5}),
+      "AI Engineer":                 mkj({Python:5,TensorFlow:5,PyTorch:5,"Machine Learning":5,"Deep Learning":5,NLP:4,"Computer Vision":4,AWS:4},{Critical_Thinking:5,Problem_Solving:5,Analytical_Thinking:5}),
+      "Data Analyst":                mkj({Python:4,SQL:5,Pandas:5,Tableau:5,"Power BI":5,Matplotlib:4,R:3,"Statistics":5},{Communication:5,Attention_to_Detail:5,Analytical_Thinking:5}),
+      "NLP Engineer":                mkj({Python:5,TensorFlow:4,PyTorch:5,NLP:5,"Machine Learning":5,Keras:4,SQL:3},{Critical_Thinking:5,Problem_Solving:5,Curiosity:5}),
+      "Computer Vision Engineer":    mkj({Python:5,TensorFlow:5,PyTorch:5,"Computer Vision":5,"Deep Learning":5,"Machine Learning":4,C_plus_plus:3},{Problem_Solving:5,Analytical_Thinking:5,Curiosity:5}),
+      "Deep Learning Engineer":      mkj({Python:5,TensorFlow:5,PyTorch:5,"Deep Learning":5,Keras:4,NumPy:4,"Machine Learning":5},{Critical_Thinking:5,Problem_Solving:5,Curiosity:5}),
+      "Data Engineer":               mkj({Python:5,SQL:5,Spark:5,Hadoop:4,AWS:4,MongoDB:4,Docker:3,Kubernetes:3},{Problem_Solving:5,Teamwork:4,Critical_Thinking:4}),
+      "Big Data Engineer":           mkj({Spark:5,Hadoop:5,Python:4,SQL:5,AWS:4,MongoDB:4,Docker:3},{Problem_Solving:5,Teamwork:4,Analytical_Thinking:5}),
+      "MLOps Engineer":              mkj({Python:5,"Machine Learning":5,Docker:5,Kubernetes:5,AWS:4,GCP:4,"CI/CD":4},{Adaptability:5,Problem_Solving:5,Critical_Thinking:4}),
+      "Data Architect":              mkj({SQL:5,MongoDB:5,AWS:5,GCP:4,Python:4,Spark:4,Docker:4},{Leadership:5,Critical_Thinking:5,Analytical_Thinking:5}),
+      "Business Intelligence Analyst":mkj({SQL:5,Tableau:5,"Power BI":5,Python:4,R:3,"Statistics":4,Pandas:4},{Communication:5,Analytical_Thinking:5,Attention_to_Detail:5}),
+      "Statistical Analyst":         mkj({R:5,Python:5,"Statistics":5,SQL:4,Pandas:4,NumPy:4,Matplotlib:4},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Quantitative Analyst":        mkj({Python:5,R:5,"Statistics":5,SQL:4,TensorFlow:3,"Machine Learning":4},{Analytical_Thinking:5,Critical_Thinking:5,Problem_Solving:5}),
+      "Predictive Analyst":          mkj({Python:5,"Machine Learning":5,SQL:4,TensorFlow:4,Pandas:5,"Statistics":5},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:5}),
+      "AI Research Scientist":       mkj({Python:5,TensorFlow:5,PyTorch:5,"Deep Learning":5,NLP:4,"Computer Vision":4,"Machine Learning":5},{Curiosity:5,Critical_Thinking:5,Problem_Solving:5,Work_Ethic:5}),
+      "Data Visualization Specialist":mkj({Python:4,Tableau:5,"Power BI":5,Matplotlib:5,R:4,SQL:4},{Communication:5,Creativity:4,Attention_to_Detail:5}),
+      "AI Product Manager":          mkj({Python:3,SQL:4,"Machine Learning":3,Tableau:3,"Power BI":3},{Communication:5,Leadership:5,Analytical_Thinking:5,Critical_Thinking:5}),
+      "AI Consultant":               mkj({Python:4,"Machine Learning":4,TensorFlow:3,SQL:4,Tableau:3},{Communication:5,Leadership:4,Analytical_Thinking:5,Adaptability:4}),
+      "Fraud Detection Analyst":     mkj({Python:5,"Machine Learning":5,SQL:5,TensorFlow:4,Pandas:4,"Statistics":4},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Recommendation System Eng":   mkj({Python:5,"Machine Learning":5,TensorFlow:4,PyTorch:4,SQL:4,Spark:3},{Problem_Solving:5,Analytical_Thinking:5,Critical_Thinking:4}),
+      "Decision Scientist":          mkj({Python:5,R:4,"Statistics":5,SQL:5,"Machine Learning":4,Tableau:4,"Power BI":4},{Analytical_Thinking:5,Critical_Thinking:5,Communication:4}),
+      "Robotics Engineer (AI)":      mkj({Python:5,TensorFlow:4,PyTorch:4,"Machine Learning":4,"Computer Vision":4,"Deep Learning":3},{Problem_Solving:5,Analytical_Thinking:4,Adaptability:4}),
+      "Algorithm Engineer":          mkj({Python:5,"Machine Learning":4,"Data Structures":5,SQL:3,TensorFlow:3},{Critical_Thinking:5,Problem_Solving:5,Analytical_Thinking:5}),
+      "Data Mining Engineer":        mkj({Python:5,SQL:5,"Machine Learning":4,Spark:4,Hadoop:4,MongoDB:3},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:4}),
+      "Cloud ML Engineer":           mkj({AWS:5,GCP:5,"Machine Learning":5,Python:5,TensorFlow:4,Docker:4,Kubernetes:4},{Adaptability:5,Problem_Solving:5,Teamwork:4}),
+      "Natural Language Processing Researcher":mkj({Python:5,PyTorch:5,TensorFlow:4,NLP:5,"Deep Learning":5,Keras:4},{Curiosity:5,Critical_Thinking:5,Work_Ethic:5}),
+      "AI Safety Researcher":        mkj({Python:5,TensorFlow:4,PyTorch:4,"Machine Learning":5,"Deep Learning":4,"Statistics":4},{Critical_Thinking:5,Curiosity:5,Work_Ethic:5,Problem_Solving:5}),
+      "Generative AI Engineer":      mkj({Python:5,PyTorch:5,TensorFlow:4,"Deep Learning":5,NLP:5,"Machine Learning":4},{Creativity:5,Problem_Solving:5,Curiosity:5}),
+      "Speech Recognition Engineer": mkj({Python:5,TensorFlow:4,PyTorch:4,NLP:5,"Deep Learning":4,Keras:4},{Problem_Solving:5,Analytical_Thinking:4,Adaptability:4}),
+      "Reinforcement Learning Eng":  mkj({Python:5,PyTorch:5,TensorFlow:4,"Machine Learning":5,"Deep Learning":5,"Statistics":4},{Problem_Solving:5,Analytical_Thinking:5,Curiosity:5}),
+      "AI Ethics Specialist":        mkj({Python:3,"Machine Learning":3,SQL:3,"Statistics":3},{Communication:5,Critical_Thinking:5,Leadership:4,Analytical_Thinking:5}),
+      "Knowledge Graph Engineer":    mkj({Python:5,SQL:4,NLP:4,"Machine Learning":3,MongoDB:4},{Analytical_Thinking:5,Problem_Solving:4,Critical_Thinking:4}),
+      "Time Series Analyst":         mkj({Python:5,R:4,"Statistics":5,SQL:4,"Machine Learning":4,Pandas:5,NumPy:5},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Healthcare Data Analyst":     mkj({Python:4,SQL:5,R:4,"Statistics":5,Tableau:4,"Power BI":4,Pandas:4},{Analytical_Thinking:5,Communication:4,Attention_to_Detail:5}),
+      "Financial Data Analyst":      mkj({Python:5,R:4,SQL:5,"Statistics":5,"Machine Learning":4,Pandas:5,Tableau:4},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Environmental Data Scientist":mkj({Python:4,R:5,SQL:4,"Statistics":5,Tableau:3,Matplotlib:4},{Analytical_Thinking:5,Curiosity:4,Problem_Solving:4}),
+      "GIS Data Analyst":            mkj({Python:4,SQL:5,R:3,"Statistics":4,Tableau:4,"Power BI":3},{Analytical_Thinking:5,Attention_to_Detail:5,Communication:4}),
+      "Social Media Analyst":        mkj({Python:4,SQL:4,R:3,"Statistics":4,Tableau:4,"Power BI":4,NLP:3},{Communication:5,Analytical_Thinking:4,Attention_to_Detail:4}),
+      "Operations Research Analyst": mkj({Python:5,R:5,"Statistics":5,SQL:4,"Machine Learning":4,Pandas:4},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:5}),
+      "Text Analytics Engineer":     mkj({Python:5,NLP:5,PyTorch:4,TensorFlow:4,"Machine Learning":4,SQL:3},{Analytical_Thinking:5,Problem_Solving:4,Critical_Thinking:4}),
+      "Conversational AI Engineer":  mkj({Python:5,NLP:5,PyTorch:5,TensorFlow:4,"Deep Learning":4,Keras:4},{Problem_Solving:5,Creativity:4,Adaptability:4}),
+      "Autonomous Systems Engineer": mkj({Python:5,C_plus_plus:4,"Computer Vision":5,"Machine Learning":5,"Deep Learning":4,TensorFlow:4},{Problem_Solving:5,Critical_Thinking:5,Adaptability:4}),
+      "AI Infrastructure Engineer":  mkj({Docker:5,Kubernetes:5,AWS:5,GCP:5,Python:4,"Machine Learning":3,"CI/CD":4},{Adaptability:5,Problem_Solving:5,Teamwork:4}),
+      "Research Data Scientist":     mkj({Python:5,R:5,"Statistics":5,TensorFlow:4,PyTorch:4,"Machine Learning":5,Pandas:5,NumPy:5},{Curiosity:5,Critical_Thinking:5,Work_Ethic:5}),
+      "Biomedical Data Scientist":   mkj({Python:4,R:5,SQL:4,"Statistics":5,Pandas:4,NumPy:4,"Machine Learning":4},{Analytical_Thinking:5,Curiosity:5,Attention_to_Detail:5}),
+      "Supply Chain Data Analyst":   mkj({Python:4,SQL:5,Pandas:4,"Statistics":4,Tableau:4,"Power BI":4,Spark:3},{Analytical_Thinking:5,Communication:4,Problem_Solving:4}),
+      "Retail Analytics Specialist": mkj({Python:4,SQL:5,"Machine Learning":3,Tableau:5,"Power BI":4,R:3,"Statistics":4},{Communication:5,Analytical_Thinking:4,Attention_to_Detail:4}),
+      "Cybersecurity Data Analyst":  mkj({Python:5,SQL:4,"Machine Learning":4,"Statistics":4,Pandas:4,NumPy:3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "Product Analytics Manager":   mkj({SQL:5,Python:4,Tableau:4,"Power BI":4,"Statistics":4,"Machine Learning":3},{Communication:5,Leadership:5,Analytical_Thinking:5}),
+    }
+  },
+
+  // ─── CSBS ── 50 jobs ───────────────────────────────────────
+  "CSBS": {
+    tech_skills: ["Python","SQL","Java","JavaScript","R","Power BI","Tableau","Excel (Advanced)","SAP","ERP Systems","AWS","Azure","Machine Learning","Data Analysis","Statistics","Blockchain","CRM Tools","Salesforce","Project Management Tools","MS Office Suite","API Integration","Cloud Computing","Cybersecurity Basics","Business Analytics","Digital Marketing Tools"],
+    soft_skills: ["Communication","Leadership","Critical Thinking","Problem Solving","Teamwork","Negotiation","Presentation","Adaptability","Strategic Thinking","Attention to Detail"],
+    jobs: {
+      "Business Analyst":            mkj({SQL:5,"Power BI":4,Tableau:4,"Business Analytics":5,"Data Analysis":4,Excel_Advanced:5,"ERP Systems":3},{Communication:5,Critical_Thinking:5,Problem_Solving:5}),
+      "Data Analyst":                mkj({Python:4,SQL:5,"Data Analysis":5,Tableau:5,"Power BI":5,R:3,"Statistics":4,Excel_Advanced:5},{Analytical_Thinking:5,Attention_to_Detail:5,Communication:4}),
+      "Systems Analyst":             mkj({SQL:5,Java:4,Python:3,"ERP Systems":4,"API Integration":4,AWS:3},{Critical_Thinking:5,Problem_Solving:5,Communication:4,Teamwork:4}),
+      "IT Consultant":               mkj({SQL:4,AWS:4,"Cloud Computing":4,"ERP Systems":4,"Cybersecurity Basics":3,Python:3},{Communication:5,Leadership:4,Critical_Thinking:5,Adaptability:4}),
+      "Financial Analyst":           mkj({SQL:5,Excel_Advanced:5,"Power BI":4,Tableau:4,R:3,"Statistics":5,"Business Analytics":4},{Attention_to_Detail:5,Analytical_Thinking:5,Communication:4}),
+      "FinTech Analyst":             mkj({Python:4,SQL:5,"Machine Learning":3,"Business Analytics":4,Blockchain:4,"Data Analysis":4,AWS:3},{Critical_Thinking:5,Analytical_Thinking:5,Adaptability:4}),
+      "Product Manager":             mkj({SQL:4,"Business Analytics":4,Salesforce:3,"CRM Tools":3,"Project Management Tools":4,AWS:3},{Communication:5,Leadership:5,Strategic_Thinking:5,Problem_Solving:4}),
+      "Project Manager":             mkj({"Project Management Tools":5,SQL:3,"MS Office Suite":4,AWS:3,"Business Analytics":3},{Leadership:5,Communication:5,Teamwork:5,Strategic_Thinking:5}),
+      "ERP Consultant":              mkj({"ERP Systems":5,SAP:5,SQL:4,"Business Analytics":4,Excel_Advanced:4,"CRM Tools":3},{Communication:5,Leadership:4,Adaptability:4,Problem_Solving:4}),
+      "CRM Specialist":              mkj({Salesforce:5,"CRM Tools":5,SQL:4,"Business Analytics":3,Excel_Advanced:4,Python:3},{Communication:5,Attention_to_Detail:4,Leadership:3,Teamwork:4}),
+      "Digital Transformation Analyst":mkj({AWS:4,"Cloud Computing":4,"ERP Systems":4,Python:3,SQL:4,"Business Analytics":4,Blockchain:3},{Leadership:5,Adaptability:5,Strategic_Thinking:5,Communication:4}),
+      "Market Analyst":              mkj({SQL:4,"Power BI":4,Tableau:4,R:3,"Statistics":4,"Business Analytics":4,Excel_Advanced:4,"Digital Marketing Tools":4},{Communication:5,Analytical_Thinking:5,Critical_Thinking:4}),
+      "Supply Chain Analyst":        mkj({SQL:5,Excel_Advanced:5,"Business Analytics":4,"ERP Systems":4,"Power BI":4,SAP:4},{Problem_Solving:5,Analytical_Thinking:5,Communication:4,Teamwork:4}),
+      "Operations Analyst":          mkj({SQL:5,Excel_Advanced:4,"Business Analytics":5,"Power BI":4,"ERP Systems":4,"Project Management Tools":4},{Problem_Solving:5,Critical_Thinking:5,Analytical_Thinking:5}),
+      "Risk Analyst":                mkj({SQL:5,R:4,"Statistics":5,Python:4,"Business Analytics":4,Excel_Advanced:5},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Cloud Consultant":            mkj({AWS:5,Azure:5,"Cloud Computing":5,Python:3,SQL:3,"ERP Systems":3},{Communication:5,Leadership:4,Adaptability:5,Critical_Thinking:4}),
+      "Business Intelligence Analyst":mkj({SQL:5,"Power BI":5,Tableau:5,R:4,"Statistics":4,Python:4,"Business Analytics":5},{Communication:5,Analytical_Thinking:5,Attention_to_Detail:5}),
+      "Strategy Analyst":            mkj({"Business Analytics":5,SQL:4,Tableau:4,"Power BI":4,Excel_Advanced:5,R:3,"Statistics":4},{Strategic_Thinking:5,Critical_Thinking:5,Communication:5}),
+      "Management Consultant":       mkj({"Business Analytics":5,Excel_Advanced:5,SQL:4,"Project Management Tools":4,Salesforce:3},{Communication:5,Leadership:5,Strategic_Thinking:5,Negotiation:5}),
+      "Tech Consultant":             mkj({SQL:4,AWS:4,"Cloud Computing":4,Python:3,"Cybersecurity Basics":3,"ERP Systems":3},{Communication:5,Critical_Thinking:5,Adaptability:4,Problem_Solving:4}),
+      "Blockchain Developer":        mkj({Blockchain:5,Python:4,JavaScript:4,SQL:3,"Cybersecurity Basics":4},{Critical_Thinking:5,Problem_Solving:5,Adaptability:4}),
+      "Application Analyst":         mkj({SQL:5,Java:4,Python:3,"ERP Systems":4,"API Integration":4,AWS:3},{Problem_Solving:5,Attention_to_Detail:5,Communication:4}),
+      "Product Analyst":             mkj({SQL:5,"Business Analytics":4,Tableau:4,"Power BI":4,Python:3,R:3,"Statistics":4},{Analytical_Thinking:5,Communication:4,Problem_Solving:4}),
+      "Growth Analyst":              mkj({SQL:5,Python:4,"Business Analytics":4,Tableau:4,"Digital Marketing Tools":4,"Data Analysis":4},{Analytical_Thinking:5,Communication:4,Adaptability:4}),
+      "Data Scientist":              mkj({Python:5,SQL:5,"Machine Learning":4,R:4,"Statistics":5,Tableau:3,"Data Analysis":5},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:5}),
+      "Salesforce Administrator":    mkj({Salesforce:5,"CRM Tools":5,SQL:4,"ERP Systems":3,Excel_Advanced:4},{Communication:5,Attention_to_Detail:4,Adaptability:4}),
+      "Digital Marketing Analyst":   mkj({"Digital Marketing Tools":5,SQL:4,Google_Analytics:4,Excel_Advanced:4,"Power BI":3,Tableau:3},{Communication:5,Creativity:4,Analytical_Thinking:4}),
+      "E-Commerce Analyst":          mkj({"Digital Marketing Tools":4,SQL:5,Python:4,"Business Analytics":4,Tableau:4,"Power BI":4},{Analytical_Thinking:5,Communication:4,Attention_to_Detail:4}),
+      "Financial Technology Analyst":mkj({Python:4,SQL:5,"Statistics":4,"Business Analytics":4,Blockchain:4,"Machine Learning":3,Excel_Advanced:5},{Analytical_Thinking:5,Critical_Thinking:5,Attention_to_Detail:5}),
+      "Healthcare Business Analyst": mkj({SQL:5,Excel_Advanced:5,"Power BI":4,Tableau:4,"Business Analytics":5,"ERP Systems":3},{Communication:5,Critical_Thinking:4,Attention_to_Detail:5}),
+      "HR Analytics Specialist":     mkj({SQL:4,Excel_Advanced:5,"Power BI":4,Tableau:3,R:3,"Statistics":4,"Business Analytics":3},{Communication:5,Analytical_Thinking:4,Leadership:3}),
+      "Procurement Analyst":         mkj({SQL:5,Excel_Advanced:5,"ERP Systems":4,SAP:4,"Business Analytics":4,"Power BI":3},{Analytical_Thinking:5,Negotiation:4,Attention_to_Detail:5}),
+      "Logistics Analyst":           mkj({SQL:5,Excel_Advanced:4,"ERP Systems":5,SAP:4,"Power BI":4,Tableau:3,"Business Analytics":4},{Problem_Solving:5,Analytical_Thinking:5,Teamwork:4}),
+      "IT Project Manager":          mkj({"Project Management Tools":5,SQL:4,AWS:3,"Cloud Computing":3,"ERP Systems":3,"MS Office Suite":4},{Leadership:5,Communication:5,Teamwork:5,Problem_Solving:4}),
+      "Cloud Business Analyst":      mkj({AWS:4,Azure:4,"Cloud Computing":5,SQL:4,"Business Analytics":4,"ERP Systems":3,Python:3},{Communication:5,Critical_Thinking:4,Adaptability:5}),
+      "Cybersecurity Analyst":       mkj({"Cybersecurity Basics":5,SQL:4,Python:3,AWS:4,"Cloud Computing":3},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "SAP Consultant":              mkj({SAP:5,"ERP Systems":5,SQL:4,Excel_Advanced:4,"Business Analytics":4,"CRM Tools":3},{Communication:5,Adaptability:4,Leadership:3,Problem_Solving:4}),
+      "Innovation Analyst":          mkj({"Business Analytics":4,Python:3,SQL:4,Tableau:3,"Digital Marketing Tools":3,Blockchain:3},{Creativity:5,Strategic_Thinking:5,Communication:4,Leadership:4}),
+      "Revenue Operations Analyst":  mkj({SQL:5,Salesforce:4,"CRM Tools":4,"Business Analytics":4,"Power BI":4,Tableau:4,Excel_Advanced:5},{Analytical_Thinking:5,Communication:4,Problem_Solving:4}),
+      "Compliance Analyst":          mkj({SQL:4,Excel_Advanced:5,"ERP Systems":4,"Cybersecurity Basics":3,SAP:3,MS_Office_Suite:4},{Attention_to_Detail:5,Critical_Thinking:5,Communication:4}),
+      "Insurance Analyst":           mkj({SQL:5,R:4,"Statistics":5,Excel_Advanced:5,"Business Analytics":4,"Power BI":3},{Analytical_Thinking:5,Attention_to_Detail:5,Communication:4}),
+      "Customer Success Analyst":    mkj({Salesforce:4,"CRM Tools":5,SQL:4,"Business Analytics":3,Excel_Advanced:4},{Communication:5,Teamwork:4,Leadership:3,Adaptability:4}),
+      "Talent Analytics Specialist": mkj({SQL:4,Excel_Advanced:5,"Power BI":3,Tableau:3,R:3,"Statistics":4,"Business Analytics":3},{Analytical_Thinking:4,Communication:5,Leadership:3}),
+      "Pricing Analyst":             mkj({SQL:5,R:4,"Statistics":5,"Business Analytics":4,Excel_Advanced:5,Tableau:4,"Power BI":3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Data Governance Analyst":     mkj({SQL:5,"Business Analytics":4,Excel_Advanced:4,"ERP Systems":4,"MS Office Suite":4,Python:3},{Attention_to_Detail:5,Communication:4,Critical_Thinking:5}),
+      "Agile Business Analyst":      mkj({"Project Management Tools":4,SQL:4,"Business Analytics":4,"ERP Systems":3,"MS Office Suite":4,"API Integration":3},{Communication:5,Teamwork:5,Adaptability:5,Problem_Solving:4}),
+      "Digital Banking Analyst":     mkj({SQL:5,Python:3,Blockchain:3,"Business Analytics":4,Excel_Advanced:5,"Cybersecurity Basics":3},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:4}),
+      "Startup Business Analyst":    mkj({"Business Analytics":5,SQL:4,Python:3,Tableau:3,"Digital Marketing Tools":4,Excel_Advanced:4},{Adaptability:5,Strategic_Thinking:5,Communication:4,Leadership:4}),
+      "Mergers & Acquisitions Analyst":mkj({SQL:4,Excel_Advanced:5,"Statistics":4,"Business Analytics":5,R:3,"MS Office Suite":4},{Analytical_Thinking:5,Negotiation:5,Attention_to_Detail:5}),
+    }
+  },
+
+  // ─── IT ── 50 jobs ─────────────────────────────────────────
+  "IT": {
+    tech_skills: ["Python","Java","JavaScript","SQL","HTML/CSS","Linux","Windows Server","AWS","Azure","Docker","Kubernetes","Networking (TCP/IP)","Cybersecurity","Active Directory","ITIL","ServiceNow","Selenium","Jenkins","Terraform","Ansible","Git","REST API","Power BI","Cloud Computing","JIRA"],
+    soft_skills: ["Problem Solving","Communication","Teamwork","Adaptability","Critical Thinking","Leadership","Attention to Detail","Customer Service","Work Ethic","Time Management"],
+    jobs: {
+      "IT Support Engineer":         mkj({Windows_Server:5,"Active Directory":4,Networking_TCPIP:5,Linux:3,ITIL:4,ServiceNow:4},{Customer_Service:5,Communication:5,Problem_Solving:5}),
+      "Network Engineer":            mkj({"Networking (TCP/IP)":5,Linux:4,Windows_Server:4,Cybersecurity:4,AWS:3,Ansible:3},{Problem_Solving:5,Attention_to_Detail:4,Adaptability:4}),
+      "System Administrator":        mkj({Linux:5,Windows_Server:5,"Active Directory":5,AWS:4,Docker:3,Python:3,Ansible:4},{Problem_Solving:5,Attention_to_Detail:5,Teamwork:4}),
+      "Cloud Engineer":              mkj({AWS:5,Azure:5,Docker:4,Kubernetes:4,Terraform:4,Python:3,Linux:4},{Adaptability:5,Problem_Solving:4,Critical_Thinking:4}),
+      "Cloud Architect":             mkj({AWS:5,Azure:5,Docker:5,Kubernetes:5,Terraform:5,"Cloud Computing":5,Linux:4},{Leadership:5,Critical_Thinking:5,Problem_Solving:5}),
+      "Cybersecurity Analyst":       mkj({Cybersecurity:5,Linux:5,"Networking (TCP/IP)":5,Python:3,AWS:4,Selenium:2},{Problem_Solving:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Network Security Engineer":   mkj({Cybersecurity:5,"Networking (TCP/IP)":5,Linux:4,AWS:4,Docker:3,Python:3},{Critical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "Information Security Analyst":mkj({Cybersecurity:5,Linux:4,"Networking (TCP/IP)":4,Python:3,AWS:4,ITIL:3},{Attention_to_Detail:5,Critical_Thinking:5,Problem_Solving:5}),
+      "DevOps Engineer":             mkj({Docker:5,Kubernetes:5,Jenkins:5,Terraform:4,Ansible:4,Python:4,AWS:4,Git:4,"CI/CD":4},{Problem_Solving:5,Adaptability:5,Teamwork:4}),
+      "Infrastructure Engineer":     mkj({Linux:5,Windows_Server:4,AWS:4,Docker:4,Terraform:4,Ansible:4,"Networking (TCP/IP)":4},{Problem_Solving:5,Adaptability:4,Critical_Thinking:4}),
+      "Database Administrator":      mkj({SQL:5,Linux:4,Windows_Server:3,AWS:3,Python:3,"Active Directory":3},{Attention_to_Detail:5,Problem_Solving:5,Critical_Thinking:4}),
+      "Web Developer":               mkj({JavaScript:5,"HTML/CSS":5,"REST API":4,Python:3,SQL:4,Git:4,Docker:3},{Creativity:4,Problem_Solving:4,Communication:4}),
+      "Software Developer":          mkj({Python:5,Java:5,JavaScript:4,SQL:4,Git:4,"REST API":4,Docker:3},{Problem_Solving:5,Teamwork:4,Critical_Thinking:4}),
+      "IT Analyst":                  mkj({SQL:5,"Power BI":4,Python:3,ITIL:4,ServiceNow:4,Windows_Server:4},{Analytical_Thinking:5,Communication:4,Problem_Solving:4}),
+      "IT Auditor":                  mkj({SQL:4,Cybersecurity:4,ITIL:5,"Active Directory":4,Windows_Server:4,ServiceNow:3},{Attention_to_Detail:5,Critical_Thinking:5,Communication:4}),
+      "Technical Support Specialist":mkj({Windows_Server:5,"Active Directory":4,ITIL:5,ServiceNow:5,"Networking (TCP/IP)":4,Linux:3},{Customer_Service:5,Communication:5,Problem_Solving:5}),
+      "Help Desk Engineer":          mkj({Windows_Server:4,"Active Directory":3,ITIL:4,ServiceNow:5,"Networking (TCP/IP)":3},{Customer_Service:5,Communication:5,Adaptability:4}),
+      "Application Support Engineer":mkj({SQL:4,Python:3,Java:3,"REST API":3,ITIL:4,ServiceNow:4,Windows_Server:3},{Problem_Solving:5,Communication:4,Teamwork:4}),
+      "Data Analyst":                mkj({SQL:5,"Power BI":5,Python:4,JavaScript:2,Git:3,AWS:3},{Analytical_Thinking:5,Attention_to_Detail:5,Communication:4}),
+      "Business Analyst":            mkj({SQL:5,"Power BI":4,JIRA:4,ServiceNow:3,"REST API":3,Python:3},{Communication:5,Critical_Thinking:5,Problem_Solving:5}),
+      "IT Project Manager":          mkj({JIRA:5,"Project Management Tools":5,SQL:3,AWS:3,ITIL:4,ServiceNow:4},{Leadership:5,Communication:5,Teamwork:5,Time_Management:5}),
+      "IT Consultant":               mkj({AWS:4,Azure:4,"Cloud Computing":4,SQL:4,ITIL:4,ServiceNow:3,Cybersecurity:3},{Communication:5,Leadership:4,Critical_Thinking:5,Adaptability:4}),
+      "Operations Engineer":         mkj({Linux:4,Windows_Server:4,Docker:4,Kubernetes:3,AWS:4,Ansible:3,Terraform:3},{Problem_Solving:5,Teamwork:4,Adaptability:4}),
+      "Systems Analyst":             mkj({SQL:5,Java:4,Python:3,JIRA:4,ServiceNow:3,"REST API":4,"Active Directory":3},{Critical_Thinking:5,Communication:4,Problem_Solving:4}),
+      "IT Risk Analyst":             mkj({Cybersecurity:5,SQL:4,ITIL:5,"Active Directory":4,Windows_Server:3,Python:3},{Attention_to_Detail:5,Critical_Thinking:5,Analytical_Thinking:4}),
+      "Technical Writer":            mkj({HTML_CSS:3,Python:2,SQL:2,Git:3,JIRA:3,ServiceNow:2,"MS Office":4},{Communication:5,Attention_to_Detail:5,Adaptability:4}),
+      "Automation Test Engineer":    mkj({Selenium:5,Python:4,Java:4,Jenkins:4,Git:4,JIRA:4,SQL:3},{Attention_to_Detail:5,Problem_Solving:5,Critical_Thinking:4}),
+      "QA Engineer":                 mkj({Selenium:4,Python:4,Java:3,SQL:4,JIRA:5,Git:4,Jenkins:3},{Attention_to_Detail:5,Problem_Solving:5,Communication:4}),
+      "Mobile App Developer":        mkj({JavaScript:4,Java:4,Python:3,SQL:3,Git:4,"REST API":4,AWS:3},{Problem_Solving:4,Creativity:4,Attention_to_Detail:4}),
+      "Cloud Security Engineer":     mkj({AWS:5,Azure:4,Cybersecurity:5,Terraform:4,Docker:4,Kubernetes:3,Linux:5},{Attention_to_Detail:5,Critical_Thinking:5,Problem_Solving:5}),
+      "Network Administrator":       mkj({"Networking (TCP/IP)":5,Linux:4,Windows_Server:4,"Active Directory":4,Ansible:3,Cybersecurity:3},{Problem_Solving:5,Attention_to_Detail:4,Communication:4}),
+      "ERP Administrator":           mkj({SQL:4,SAP:4,"Active Directory":3,Windows_Server:4,ITIL:4,ServiceNow:4},{Communication:4,Problem_Solving:4,Adaptability:4}),
+      "Virtualization Engineer":     mkj({Linux:5,Windows_Server:5,VMware:4,Docker:4,Kubernetes:4,AWS:4,Ansible:3},{Problem_Solving:5,Attention_to_Detail:4,Adaptability:4}),
+      "IoT Engineer":                mkj({Python:4,"Networking (TCP/IP)":4,AWS:4,Linux:4,"REST API":4,Docker:3,SQL:3},{Problem_Solving:5,Creativity:4,Adaptability:5}),
+      "Site Reliability Engineer":   mkj({Linux:5,Docker:5,Kubernetes:5,AWS:4,Python:4,Jenkins:4,Git:4},{Problem_Solving:5,Adaptability:5,Critical_Thinking:4}),
+      "Identity Access Manager":     mkj({"Active Directory":5,Cybersecurity:4,Windows_Server:4,ITIL:4,SQL:3,Linux:3},{Attention_to_Detail:5,Communication:4,Critical_Thinking:4}),
+      "Service Desk Analyst":        mkj({ITIL:5,ServiceNow:5,Windows_Server:4,"Active Directory":3,"Networking (TCP/IP)":3},{Customer_Service:5,Communication:5,Problem_Solving:4,Teamwork:4}),
+      "Incident Manager":            mkj({ITIL:5,ServiceNow:5,SQL:3,Windows_Server:3,JIRA:4},{Leadership:5,Communication:5,Problem_Solving:5,Teamwork:4}),
+      "Change Manager":              mkj({ITIL:5,ServiceNow:4,JIRA:4,SQL:3,Windows_Server:3},{Leadership:5,Communication:5,Adaptability:4,Critical_Thinking:4}),
+      "Capacity Planner":            mkj({Linux:4,Windows_Server:4,AWS:4,SQL:4,Python:3,Docker:3,Ansible:3},{Analytical_Thinking:5,Critical_Thinking:5,Problem_Solving:4}),
+      "Backup & Recovery Specialist":mkj({Linux:5,Windows_Server:5,AWS:4,SQL:4,Docker:3,Ansible:3},{Attention_to_Detail:5,Problem_Solving:5,Adaptability:4}),
+      "Software Configuration Mgr":  mkj({Git:5,Jenkins:4,Docker:4,JIRA:5,Python:3,Java:3,Ansible:3},{Attention_to_Detail:5,Problem_Solving:4,Teamwork:4}),
+      "API Developer":               mkj({"REST API":5,Python:5,Java:4,Node_js:4,SQL:4,Docker:3,Git:4},{Problem_Solving:5,Attention_to_Detail:4,Teamwork:4}),
+      "Big Data Engineer":           mkj({Python:4,SQL:5,Spark:4,Hadoop:4,AWS:4,Docker:3,Kubernetes:3},{Problem_Solving:5,Analytical_Thinking:5,Teamwork:4}),
+      "Storage Engineer":            mkj({Linux:5,Windows_Server:4,AWS:4,SQL:4,Python:2,Ansible:3},{Problem_Solving:5,Attention_to_Detail:5,Adaptability:4}),
+      "Monitoring Engineer":         mkj({Linux:4,Docker:4,Kubernetes:4,Python:4,AWS:4,Ansible:3,Jenkins:3},{Problem_Solving:5,Attention_to_Detail:5,Adaptability:4}),
+      "IT Governance Specialist":    mkj({ITIL:5,SQL:4,Windows_Server:3,Cybersecurity:4,ServiceNow:4,JIRA:3},{Communication:5,Critical_Thinking:5,Leadership:4,Attention_to_Detail:5}),
+      "Software Architect (IT)":     mkj({Java:5,Python:4,Docker:5,Kubernetes:5,"REST API":5,AWS:5,SQL:4},{Leadership:5,Critical_Thinking:5,Communication:5}),
+      "Telecom IT Engineer":         mkj({"Networking (TCP/IP)":5,Linux:4,Python:3,AWS:3,Ansible:3,Windows_Server:3},{Problem_Solving:5,Attention_to_Detail:4,Adaptability:4}),
+    }
+  },
+
+  // ─── ECE ── 35 jobs ────────────────────────────────────────
+  "ECE": {
+    tech_skills: ["VLSI Design","Embedded C","MATLAB","FPGA Programming","PCB Design","Signal Processing","AutoCAD (Electrical)","ANSYS","PLC Programming","SCADA","SolidWorks","ARM Microcontroller","VHDL/Verilog","LabVIEW","RF & Antenna Design","OrCAD","LTSpice","Keil µVision","RTOS","IoT Protocols"],
+    soft_skills: ["Problem Solving","Analytical Thinking","Teamwork","Communication","Attention to Detail","Adaptability","Critical Thinking","Leadership","Work Ethic","Creativity"],
+    jobs: {
+      "VLSI Design Engineer":        mkj({"VLSI Design":5,"VHDL/Verilog":5,MATLAB:4,FPGA_Programming:4,"Embedded C":3,LTSpice:3,OrCAD:3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "FPGA Engineer":               mkj({"FPGA Programming":5,"VHDL/Verilog":5,"Embedded C":4,MATLAB:4,"VLSI Design":3,Keil_uVision:3,"Signal Processing":3},{Problem_Solving:5,Analytical_Thinking:5,Attention_to_Detail:5}),
+      "Embedded Systems Engineer":   mkj({"Embedded C":5,"ARM Microcontroller":5,RTOS:4,Keil_uVision:4,"FPGA Programming":3,MATLAB:3,IoT_Protocols:3},{Problem_Solving:5,Attention_to_Detail:5,Analytical_Thinking:5}),
+      "PCB Design Engineer":         mkj({"PCB Design":5,OrCAD:5,LTSpice:4,"AutoCAD (Electrical)":3,ANSYS:3,"Signal Processing":3},{Attention_to_Detail:5,Analytical_Thinking:5,Problem_Solving:4}),
+      "RF & Antenna Engineer":       mkj({"RF & Antenna Design":5,MATLAB:5,"Signal Processing":5,ANSYS:4,LTSpice:3,OrCAD:3,"VLSI Design":2},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Signal Processing Engineer":  mkj({"Signal Processing":5,MATLAB:5,"FPGA Programming":4,"VLSI Design":3,LabVIEW:4,LTSpice:3,"VHDL/Verilog":3},{Analytical_Thinking:5,Critical_Thinking:5,Attention_to_Detail:5}),
+      "Telecom Engineer":            mkj({"RF & Antenna Design":4,MATLAB:4,"Signal Processing":4,"VLSI Design":3,"AutoCAD (Electrical)":3,LabVIEW:3,SCADA:2},{Problem_Solving:5,Communication:4,Analytical_Thinking:4}),
+      "Firmware Engineer":           mkj({"Embedded C":5,"ARM Microcontroller":5,RTOS:5,Keil_uVision:5,"FPGA Programming":3,"VLSI Design":3,IoT_Protocols:3},{Problem_Solving:5,Attention_to_Detail:5,Analytical_Thinking:5}),
+      "Hardware Engineer":           mkj({"PCB Design":4,LTSpice:5,OrCAD:4,"VLSI Design":4,"Embedded C":3,ANSYS:3,SolidWorks:2},{Attention_to_Detail:5,Analytical_Thinking:5,Problem_Solving:4}),
+      "IoT Engineer":                mkj({IoT_Protocols:5,"Embedded C":5,"ARM Microcontroller":4,RTOS:4,MATLAB:3,"Signal Processing":3,"FPGA Programming":3},{Problem_Solving:5,Creativity:4,Adaptability:5}),
+      "Control Systems Engineer":    mkj({MATLAB:5,PLC_Programming:5,SCADA:4,ANSYS:4,LabVIEW:4,"Embedded C":3,"Signal Processing":4},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:4}),
+      "Automation Engineer":         mkj({PLC_Programming:5,SCADA:5,MATLAB:4,ANSYS:4,LabVIEW:4,"Embedded C":3,SolidWorks:2},{Problem_Solving:5,Analytical_Thinking:4,Adaptability:4}),
+      "Instrumentation Engineer":    mkj({LabVIEW:5,MATLAB:4,PLC_Programming:4,SCADA:4,ANSYS:3,"Signal Processing":3,"Embedded C":3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "ASIC Design Engineer":        mkj({"VLSI Design":5,"VHDL/Verilog":5,"FPGA Programming":4,MATLAB:3,LTSpice:4,OrCAD:3,"Embedded C":2},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "Chip Design Engineer":        mkj({"VLSI Design":5,"VHDL/Verilog":5,MATLAB:4,"FPGA Programming":4,LTSpice:4,OrCAD:3,"Signal Processing":3},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Electronics Engineer":        mkj({"PCB Design":4,LTSpice:4,OrCAD:4,MATLAB:3,"Embedded C":3,"VLSI Design":3,ANSYS:3},{Problem_Solving:4,Analytical_Thinking:4,Attention_to_Detail:5}),
+      "Mechatronics Engineer":       mkj({MATLAB:4,PLC_Programming:4,SolidWorks:4,"Embedded C":4,ANSYS:4,"AutoCAD (Electrical)":3,RTOS:3},{Problem_Solving:5,Teamwork:4,Adaptability:4}),
+      "Avionics Engineer":           mkj({"VLSI Design":4,"Embedded C":5,MATLAB:5,"FPGA Programming":4,"Signal Processing":4,RTOS:4,LabVIEW:3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "Satellite Engineer":          mkj({MATLAB:5,"VLSI Design":4,"Signal Processing":5,"RF & Antenna Design":5,ANSYS:4,"FPGA Programming":3,LabVIEW:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Communication Engineer":      mkj({"RF & Antenna Design":5,"Signal Processing":5,MATLAB:5,"VLSI Design":3,"FPGA Programming":3,LabVIEW:4,OrCAD:3},{Analytical_Thinking:5,Communication:4,Problem_Solving:4}),
+      "Broadcast Engineer":          mkj({"Signal Processing":5,"RF & Antenna Design":4,MATLAB:4,"VLSI Design":3,LabVIEW:4,"PCB Design":3},{Communication:4,Teamwork:4,Problem_Solving:4}),
+      "Optical Engineer":            mkj({MATLAB:5,ANSYS:4,"Signal Processing":4,"RF & Antenna Design":3,LabVIEW:4,LTSpice:3,"VLSI Design":2},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Network Engineer (ECE)":      mkj({"RF & Antenna Design":4,MATLAB:3,"Signal Processing":3,"Embedded C":3,IoT_Protocols:4,"ARM Microcontroller":3,SCADA:2},{Problem_Solving:5,Communication:4,Adaptability:4}),
+      "Robotics Engineer":           mkj({"Embedded C":5,MATLAB:5,PLC_Programming:4,RTOS:4,SolidWorks:4,"FPGA Programming":3,IoT_Protocols:3},{Problem_Solving:5,Analytical_Thinking:4,Teamwork:4}),
+      "Testing Engineer":            mkj({LabVIEW:4,MATLAB:4,"PCB Design":3,LTSpice:3,OrCAD:3,"Embedded C":3,ANSYS:3},{Attention_to_Detail:5,Problem_Solving:5,Analytical_Thinking:4}),
+      "Semiconductor Engineer":      mkj({"VLSI Design":5,LTSpice:5,OrCAD:4,"VHDL/Verilog":4,MATLAB:4,"FPGA Programming":3,"Embedded C":2},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Power Electronics Engineer":  mkj({MATLAB:5,LTSpice:5,ANSYS:4,PLC_Programming:4,SCADA:3,"AutoCAD (Electrical)":3,OrCAD:4},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:4}),
+      "EV Engineer (Electronics)":   mkj({MATLAB:5,"Embedded C":4,PLC_Programming:4,SCADA:4,ANSYS:4,LTSpice:4,"Signal Processing":3},{Problem_Solving:5,Analytical_Thinking:4,Adaptability:4}),
+      "Wireless Engineer":           mkj({"RF & Antenna Design":5,"Signal Processing":5,MATLAB:5,"VLSI Design":3,LabVIEW:3,OrCAD:3,"FPGA Programming":3},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:4}),
+      "Photonics Engineer":          mkj({MATLAB:5,ANSYS:5,"Signal Processing":4,LTSpice:3,LabVIEW:4,"RF & Antenna Design":3},{Analytical_Thinking:5,Attention_to_Detail:5,Curiosity:4}),
+      "DSP Engineer":                mkj({"Signal Processing":5,MATLAB:5,"FPGA Programming":4,"VHDL/Verilog":4,"VLSI Design":3,LabVIEW:4,"Embedded C":3},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "MEMS Engineer":               mkj({ANSYS:5,MATLAB:4,"VLSI Design":4,LTSpice:4,"PCB Design":3,OrCAD:3,SolidWorks:3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Medical Electronics Engineer":mkj({"Embedded C":4,MATLAB:4,LabVIEW:5,ANSYS:3,"Signal Processing":4,"PCB Design":4,"ARM Microcontroller":4},{Attention_to_Detail:5,Analytical_Thinking:4,Work_Ethic:5}),
+      "AI Hardware Engineer":        mkj({"VLSI Design":5,"FPGA Programming":5,"VHDL/Verilog":5,MATLAB:4,"Embedded C":3,"Signal Processing":3},{Problem_Solving:5,Analytical_Thinking:5,Critical_Thinking:5}),
+      "Smart Grid Engineer":         mkj({MATLAB:4,SCADA:5,PLC_Programming:4,LabVIEW:4,ANSYS:3,"AutoCAD (Electrical)":3,"Signal Processing":3},{Problem_Solving:5,Analytical_Thinking:4,Teamwork:4}),
+    }
+  },
+
+  // ─── EEE ── 35 jobs ────────────────────────────────────────
+  "EEE": {
+    tech_skills: ["MATLAB/Simulink","AutoCAD (Electrical)","ANSYS Maxwell","PLC Programming","SCADA Systems","Power Systems Analysis","Electrical Circuit Design","SolidWorks","Embedded C","FPGA","LabVIEW","ETAP","PSCAD","PSSE","DIgSILENT PowerFactory","LTSpice","Relay Protection","Solar/Wind Energy Systems","Motor Drives","Industrial Automation"],
+    soft_skills: ["Problem Solving","Analytical Thinking","Safety Awareness","Teamwork","Communication","Attention to Detail","Leadership","Critical Thinking","Adaptability","Work Ethic"],
+    jobs: {
+      "Power Systems Engineer":      mkj({"Power Systems Analysis":5,MATLAB_Simulink:5,ETAP:5,PSCAD:4,PSSE:4,DIgSILENT_PowerFactory:4,"SCADA Systems":4},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Electrical Design Engineer":  mkj({"AutoCAD (Electrical)":5,"Electrical Circuit Design":5,ANSYS_Maxwell:4,LTSpice:4,MATLAB_Simulink:4,"Power Systems Analysis":3},{Attention_to_Detail:5,Analytical_Thinking:4,Problem_Solving:4}),
+      "Control Systems Engineer":    mkj({MATLAB_Simulink:5,"PLC Programming":5,"SCADA Systems":4,LabVIEW:4,"Embedded C":3,ANSYS_Maxwell:3,"Motor Drives":4},{Analytical_Thinking:5,Problem_Solving:5,Critical_Thinking:4}),
+      "PLC Engineer":                mkj({"PLC Programming":5,"SCADA Systems":5,MATLAB_Simulink:4,LabVIEW:4,"Industrial Automation":5,"Motor Drives":4,"Embedded C":3},{Problem_Solving:5,Attention_to_Detail:5,Teamwork:4}),
+      "SCADA Engineer":              mkj({"SCADA Systems":5,"PLC Programming":4,MATLAB_Simulink:4,LabVIEW:4,"Power Systems Analysis":3,"Industrial Automation":4,"Relay Protection":3},{Problem_Solving:5,Attention_to_Detail:5,Analytical_Thinking:4}),
+      "Instrumentation Engineer":    mkj({LabVIEW:5,MATLAB_Simulink:4,"PLC Programming":4,"SCADA Systems":4,ANSYS_Maxwell:3,"Electrical Circuit Design":3,"Motor Drives":3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Solar/Renewable Energy Eng":  mkj({"Solar/Wind Energy Systems":5,MATLAB_Simulink:5,ANSYS_Maxwell:4,"Power Systems Analysis":4,ETAP:4,PSCAD:3,"AutoCAD (Electrical)":4},{Problem_Solving:5,Analytical_Thinking:4,Adaptability:5}),
+      "Wind Energy Engineer":        mkj({"Solar/Wind Energy Systems":5,MATLAB_Simulink:5,ANSYS_Maxwell:4,"Power Systems Analysis":4,ETAP:3,PSCAD:3,SolidWorks:3},{Analytical_Thinking:5,Problem_Solving:5,Teamwork:4}),
+      "Transmission Engineer":       mkj({"Power Systems Analysis":5,ETAP:5,PSSE:4,PSCAD:4,DIgSILENT_PowerFactory:4,MATLAB_Simulink:4,"SCADA Systems":3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Distribution Engineer":       mkj({"Power Systems Analysis":5,ETAP:4,"AutoCAD (Electrical)":4,MATLAB_Simulink:4,DIgSILENT_PowerFactory:3,"SCADA Systems":4,"Relay Protection":3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Protection Engineer":         mkj({"Relay Protection":5,"Power Systems Analysis":5,ETAP:4,MATLAB_Simulink:4,DIgSILENT_PowerFactory:4,"SCADA Systems":4,PSSE:3},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "Substation Engineer":         mkj({"Power Systems Analysis":5,"AutoCAD (Electrical)":4,ETAP:4,"Relay Protection":4,"SCADA Systems":4,MATLAB_Simulink:3,DIgSILENT_PowerFactory:3},{Attention_to_Detail:5,Safety_Awareness:5,Problem_Solving:4}),
+      "Power Electronics Engineer":  mkj({MATLAB_Simulink:5,LTSpice:5,ANSYS_Maxwell:4,"Electrical Circuit Design":4,"Motor Drives":5,"Embedded C":4,FPGA:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "EV Engineer":                 mkj({"Motor Drives":5,MATLAB_Simulink:5,"Embedded C":4,ANSYS_Maxwell:4,"Electrical Circuit Design":4,LTSpice:4,"Solar/Wind Energy Systems":3},{Problem_Solving:5,Analytical_Thinking:4,Adaptability:5}),
+      "Embedded Engineer":           mkj({"Embedded C":5,FPGA:4,MATLAB_Simulink:4,"PLC Programming":4,"Motor Drives":3,"Electrical Circuit Design":3,LabVIEW:3},{Problem_Solving:5,Attention_to_Detail:5,Analytical_Thinking:4}),
+      "Automation Engineer":         mkj({"PLC Programming":5,"SCADA Systems":5,"Industrial Automation":5,MATLAB_Simulink:4,LabVIEW:4,"Motor Drives":4,"Embedded C":3},{Problem_Solving:5,Adaptability:4,Teamwork:4}),
+      "Motor Drives Engineer":       mkj({"Motor Drives":5,MATLAB_Simulink:5,"Power Electronics":4,ANSYS_Maxwell:4,"Embedded C":4,LTSpice:4,"Electrical Circuit Design":4},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:4}),
+      "Electrical Testing Engineer": mkj({"Electrical Circuit Design":4,MATLAB_Simulink:4,ANSYS_Maxwell:3,LTSpice:4,LabVIEW:4,"Power Systems Analysis":3,"Relay Protection":3},{Attention_to_Detail:5,Problem_Solving:5,Safety_Awareness:5}),
+      "Energy Auditor":              mkj({"Power Systems Analysis":4,MATLAB_Simulink:3,"Solar/Wind Energy Systems":3,ETAP:3,"AutoCAD (Electrical)":3,LabVIEW:3},{Analytical_Thinking:5,Communication:4,Attention_to_Detail:5}),
+      "Robotics Engineer (EEE)":     mkj({"PLC Programming":4,MATLAB_Simulink:5,"Embedded C":4,"Motor Drives":4,"Industrial Automation":5,FPGA:3,LabVIEW:4},{Problem_Solving:5,Analytical_Thinking:4,Teamwork:4}),
+      "Grid Engineer":               mkj({"Power Systems Analysis":5,ETAP:5,PSSE:4,PSCAD:4,DIgSILENT_PowerFactory:4,MATLAB_Simulink:4,"SCADA Systems":4},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Maintenance Engineer (EEE)":  mkj({"PLC Programming":4,"SCADA Systems":4,MATLAB_Simulink:3,"Electrical Circuit Design":3,"Relay Protection":3,LabVIEW:3,"Motor Drives":3},{Safety_Awareness:5,Problem_Solving:5,Teamwork:4}),
+      "Solar Plant Engineer":        mkj({"Solar/Wind Energy Systems":5,MATLAB_Simulink:5,ANSYS_Maxwell:4,ETAP:4,"AutoCAD (Electrical)":4,"Power Systems Analysis":4,PSCAD:3},{Analytical_Thinking:5,Problem_Solving:4,Work_Ethic:5}),
+      "HV Engineer":                 mkj({"Power Systems Analysis":5,"Relay Protection":5,ETAP:5,ANSYS_Maxwell:4,DIgSILENT_PowerFactory:4,PSSE:4,"SCADA Systems":3},{Safety_Awareness:5,Analytical_Thinking:5,Attention_to_Detail:5}),
+      "Electrical Supervisor":       mkj({"Electrical Circuit Design":4,"AutoCAD (Electrical)":4,"Power Systems Analysis":4,"PLC Programming":3,MATLAB_Simulink:3,"Relay Protection":3},{Leadership:5,Communication:5,Safety_Awareness:5}),
+      "Lighting Engineer":           mkj({"AutoCAD (Electrical)":5,"Electrical Circuit Design":4,MATLAB_Simulink:3,ANSYS_Maxwell:3,DIAlux:4,LTSpice:3},{Attention_to_Detail:5,Creativity:4,Problem_Solving:4}),
+      "Power Quality Engineer":      mkj({"Power Systems Analysis":5,MATLAB_Simulink:5,ETAP:4,PSCAD:4,LabVIEW:4,DIgSILENT_PowerFactory:4,"Relay Protection":3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Smart Grid Analyst":          mkj({"SCADA Systems":5,"Power Systems Analysis":5,MATLAB_Simulink:4,ETAP:4,PSSE:3,DIgSILENT_PowerFactory:4,"Solar/Wind Energy Systems":4},{Analytical_Thinking:5,Critical_Thinking:4,Adaptability:4}),
+      "Electrical Project Engineer": mkj({"AutoCAD (Electrical)":4,"Power Systems Analysis":4,"Electrical Circuit Design":4,MATLAB_Simulink:3,"PLC Programming":3,ETAP:3,"SCADA Systems":3},{Leadership:4,Communication:5,Problem_Solving:5,Teamwork:5}),
+      "Commissioning Engineer":      mkj({"PLC Programming":5,"SCADA Systems":5,"Relay Protection":4,"Power Systems Analysis":4,LabVIEW:4,MATLAB_Simulink:4,"Motor Drives":4},{Safety_Awareness:5,Communication:5,Problem_Solving:5}),
+      "Building Electrical Engineer":mkj({"AutoCAD (Electrical)":5,"Electrical Circuit Design":5,"Power Systems Analysis":4,ETAP:3,MATLAB_Simulink:3,"Relay Protection":3,DIAlux:4},{Attention_to_Detail:5,Communication:4,Problem_Solving:4}),
+      "Offshore Electrical Engineer":mkj({"Power Systems Analysis":5,"Relay Protection":4,"Electrical Circuit Design":4,ETAP:4,MATLAB_Simulink:4,"SCADA Systems":3,"AutoCAD (Electrical)":4},{Safety_Awareness:5,Analytical_Thinking:5,Teamwork:4}),
+      "Defense Electronics Engineer":mkj({"Embedded C":4,FPGA:4,MATLAB_Simulink:4,"Signal Processing":3,"VLSI Design":3,"Electrical Circuit Design":4,ANSYS_Maxwell:3},{Attention_to_Detail:5,Work_Ethic:5,Analytical_Thinking:5}),
+      "Traction Engineer":           mkj({"Motor Drives":5,"Power Systems Analysis":5,MATLAB_Simulink:5,"Embedded C":4,ANSYS_Maxwell:4,"Electrical Circuit Design":4,ETAP:3},{Analytical_Thinking:5,Problem_Solving:5,Teamwork:4}),
+      "Nuclear Power Engineer":      mkj({"Power Systems Analysis":5,"Relay Protection":5,ETAP:5,SCADA_Systems:4,MATLAB_Simulink:4,PSSE:4,DIgSILENT_PowerFactory:4},{Safety_Awareness:5,Analytical_Thinking:5,Attention_to_Detail:5}),
+    }
+  },
+
+  // ─── Mechanical ── 35 jobs ─────────────────────────────────
+  "Mechanical": {
+    tech_skills: ["AutoCAD","SolidWorks","CATIA","ANSYS (FEA/CFD)","MATLAB","GD&T","Manufacturing Processes","Thermodynamics","Fluid Mechanics","Material Science","PLC Programming","CNC Programming","SCADA","Lean Manufacturing","Six Sigma","Pro/Engineer (Creo)","HyperMesh","LS-DYNA","Inventor","Siemens NX"],
+    soft_skills: ["Problem Solving","Teamwork","Attention to Detail","Communication","Leadership","Adaptability","Work Ethic","Safety Awareness","Analytical Thinking","Critical Thinking"],
+    jobs: {
+      "Mechanical Engineer":         mkj({AutoCAD:5,SolidWorks:5,"ANSYS (FEA/CFD)":4,MATLAB:4,"GD&T":4,"Manufacturing Processes":5,"Material Science":4,CATIA:3},{Problem_Solving:5,Analytical_Thinking:4,Attention_to_Detail:5}),
+      "Design Engineer":             mkj({SolidWorks:5,CATIA:5,AutoCAD:4,"ANSYS (FEA/CFD)":4,"GD&T":5,"Pro/Engineer (Creo)":4,Inventor:4,Siemens_NX:4},{Attention_to_Detail:5,Creativity:5,Analytical_Thinking:5}),
+      "CAD Engineer":                mkj({AutoCAD:5,SolidWorks:5,CATIA:5,"Pro/Engineer (Creo)":4,Inventor:4,Siemens_NX:4,"GD&T":5},{Attention_to_Detail:5,Creativity:4,Problem_Solving:4}),
+      "Manufacturing Engineer":      mkj({"Manufacturing Processes":5,AutoCAD:4,SolidWorks:3,CNC_Programming:4,"Lean Manufacturing":4,"Six Sigma":4,"Material Science":4,PLC_Programming:3},{Problem_Solving:5,Teamwork:4,Attention_to_Detail:5}),
+      "Production Engineer":         mkj({"Manufacturing Processes":5,CNC_Programming:4,"Lean Manufacturing":5,"Six Sigma":4,PLC_Programming:4,SCADA:3,AutoCAD:3},{Problem_Solving:5,Leadership:4,Teamwork:4}),
+      "CNC Programmer":              mkj({CNC_Programming:5,AutoCAD:5,SolidWorks:4,CATIA:3,"GD&T":4,"Manufacturing Processes":4,"Pro/Engineer (Creo)":3},{Attention_to_Detail:5,Problem_Solving:5,Analytical_Thinking:4}),
+      "Automotive Engineer":         mkj({AutoCAD:4,SolidWorks:5,CATIA:5,"ANSYS (FEA/CFD)":4,"Material Science":4,MATLAB:4,Siemens_NX:4,LS_DYNA:3},{Problem_Solving:5,Analytical_Thinking:4,Teamwork:4}),
+      "Thermal Engineer":            mkj({"ANSYS (FEA/CFD)":5,MATLAB:5,"Thermodynamics":5,"Fluid Mechanics":4,SolidWorks:4,AutoCAD:3,HyperMesh:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Aeronautical Engineer":       mkj({"ANSYS (FEA/CFD)":5,MATLAB:5,"Fluid Mechanics":5,"Thermodynamics":4,SolidWorks:4,CATIA:4,HyperMesh:4,LS_DYNA:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Industrial Engineer":         mkj({"Lean Manufacturing":5,"Six Sigma":5,"Manufacturing Processes":5,AutoCAD:3,MATLAB:3,PLC_Programming:3,SCADA:3},{Analytical_Thinking:5,Problem_Solving:5,Leadership:4}),
+      "Quality Engineer":            mkj({"Six Sigma":5,"GD&T":5,"Manufacturing Processes":4,AutoCAD:3,SolidWorks:3,MATLAB:3},{Attention_to_Detail:5,Analytical_Thinking:5,Communication:4}),
+      "R&D Engineer":                mkj({"ANSYS (FEA/CFD)":5,MATLAB:5,SolidWorks:4,CATIA:4,"Material Science":5,"Thermodynamics":4,"Fluid Mechanics":4,HyperMesh:3},{Analytical_Thinking:5,Creativity:5,Work_Ethic:5}),
+      "Project Engineer":            mkj({AutoCAD:4,SolidWorks:4,"Manufacturing Processes":4,"Lean Manufacturing":3,MATLAB:3,PLC_Programming:3,SCADA:3},{Leadership:5,Communication:5,Problem_Solving:5,Teamwork:5}),
+      "Plant Engineer":              mkj({"Manufacturing Processes":4,PLC_Programming:5,SCADA:5,"Lean Manufacturing":4,AutoCAD:4,MATLAB:3,"Six Sigma":4},{Safety_Awareness:5,Problem_Solving:5,Leadership:4}),
+      "Maintenance Engineer":        mkj({PLC_Programming:4,SCADA:4,"Manufacturing Processes":4,AutoCAD:3,MATLAB:3,"Lean Manufacturing":4,"Six Sigma":3},{Problem_Solving:5,Safety_Awareness:5,Teamwork:4}),
+      "Robotics Engineer (Mech)":    mkj({AutoCAD:4,SolidWorks:4,CATIA:3,MATLAB:4,PLC_Programming:4,"ANSYS (FEA/CFD)":3,Siemens_NX:4},{Problem_Solving:5,Analytical_Thinking:4,Teamwork:4}),
+      "Mechatronics Engineer":       mkj({MATLAB:4,PLC_Programming:4,SolidWorks:4,AutoCAD:4,SCADA:3,"Manufacturing Processes":3,"ANSYS (FEA/CFD)":3},{Adaptability:4,Problem_Solving:5,Analytical_Thinking:4}),
+      "Marine Engineer":             mkj({"Fluid Mechanics":5,"Thermodynamics":4,"ANSYS (FEA/CFD)":4,AutoCAD:4,SolidWorks:3,MATLAB:4,"Material Science":3},{Problem_Solving:5,Safety_Awareness:5,Teamwork:4}),
+      "Welding Engineer":            mkj({AutoCAD:4,SolidWorks:3,"Material Science":5,"Manufacturing Processes":5,"GD&T":4,HyperMesh:3,ANSYS_FEA_CFD:4},{Attention_to_Detail:5,Safety_Awareness:5,Problem_Solving:4}),
+      "HVAC Engineer":               mkj({"Thermodynamics":5,"Fluid Mechanics":5,"ANSYS (FEA/CFD)":4,AutoCAD:5,SolidWorks:4,MATLAB:4,"Material Science":3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:4}),
+      "Reliability Engineer":        mkj({"Six Sigma":5,"Manufacturing Processes":4,"Material Science":4,MATLAB:4,AutoCAD:3,SolidWorks:3,"GD&T":4},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Energy Engineer":             mkj({"Thermodynamics":5,"Fluid Mechanics":4,MATLAB:5,"ANSYS (FEA/CFD)":4,AutoCAD:3,SolidWorks:3,"Material Science":3},{Analytical_Thinking:5,Problem_Solving:4,Work_Ethic:5}),
+      "Pipeline Engineer":           mkj({"Fluid Mechanics":5,"ANSYS (FEA/CFD)":4,AutoCAD:4,SolidWorks:3,"Material Science":4,MATLAB:4,"GD&T":3},{Safety_Awareness:5,Analytical_Thinking:5,Problem_Solving:4}),
+      "Tool Design Engineer":        mkj({SolidWorks:5,CATIA:5,"Pro/Engineer (Creo)":4,AutoCAD:4,"GD&T":5,"Manufacturing Processes":4,CNC_Programming:4},{Attention_to_Detail:5,Creativity:5,Analytical_Thinking:5}),
+      "Structural Analysis Engineer":mkj({"ANSYS (FEA/CFD)":5,HyperMesh:5,LS_DYNA:4,SolidWorks:4,"Material Science":5,MATLAB:4,"GD&T":4},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "CAM Engineer":                mkj({CNC_Programming:5,AutoCAD:4,SolidWorks:4,CATIA:4,"Pro/Engineer (Creo)":4,"Manufacturing Processes":5,"GD&T":4},{Attention_to_Detail:5,Problem_Solving:4,Analytical_Thinking:4}),
+      "Finite Element Analyst":      mkj({"ANSYS (FEA/CFD)":5,HyperMesh:5,LS_DYNA:4,MATLAB:4,SolidWorks:4,"Material Science":4,"GD&T":3},{Analytical_Thinking:5,Attention_to_Detail:5,Critical_Thinking:5}),
+      "CFD Engineer":                mkj({"ANSYS (FEA/CFD)":5,"Fluid Mechanics":5,MATLAB:5,"Thermodynamics":4,HyperMesh:4,SolidWorks:3,AutoCAD:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Lean Manufacturing Specialist":mkj({"Lean Manufacturing":5,"Six Sigma":5,"Manufacturing Processes":5,AutoCAD:3,MATLAB:2,PLC_Programming:3,"Material Science":3},{Leadership:5,Analytical_Thinking:5,Communication:5}),
+      "Defence Engineer":            mkj({"ANSYS (FEA/CFD)":4,SolidWorks:5,CATIA:4,"Material Science":5,LS_DYNA:4,HyperMesh:4,MATLAB:4},{Work_Ethic:5,Attention_to_Detail:5,Teamwork:4}),
+      "Nuclear Plant Engineer":      mkj({"Thermodynamics":5,"Fluid Mechanics":5,"ANSYS (FEA/CFD)":4,MATLAB:4,"Material Science":4,AutoCAD:3,SolidWorks:3},{Safety_Awareness:5,Analytical_Thinking:5,Attention_to_Detail:5}),
+      "Composite Materials Engineer":mkj({"Material Science":5,"ANSYS (FEA/CFD)":4,SolidWorks:4,CATIA:4,"Manufacturing Processes":4,"GD&T":4,LS_DYNA:3},{Analytical_Thinking:5,Attention_to_Detail:5,Creativity:4}),
+      "Vibration Analysis Engineer": mkj({MATLAB:5,"ANSYS (FEA/CFD)":5,HyperMesh:4,"Thermodynamics":3,SolidWorks:4,"Material Science":4,LabVIEW:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Additive Manufacturing Eng":  mkj({SolidWorks:5,CATIA:4,"Pro/Engineer (Creo)":4,AutoCAD:4,"Material Science":5,"Manufacturing Processes":4,"GD&T":4},{Creativity:5,Analytical_Thinking:4,Attention_to_Detail:5}),
+      "Oil & Gas Engineer (Mech)":   mkj({"Fluid Mechanics":5,"Thermodynamics":4,AutoCAD:5,SolidWorks:4,"ANSYS (FEA/CFD)":4,MATLAB:4,"Material Science":4},{Safety_Awareness:5,Problem_Solving:5,Teamwork:4}),
+    }
+  },
+
+  // ─── Civil ── 35 jobs ──────────────────────────────────────
+  "Civil": {
+    tech_skills: ["AutoCAD","STAAD.Pro","ETABS","SAFE","Civil 3D","Primavera P6","MS Project","ANSYS","MATLAB","ArcGIS","Revit (BIM)","SAP2000","HEC-RAS","HEC-HMS","GIS Tools","Bentley MicroStation","Tekla Structures","PLAXIS","Navisworks","OpenRoads"],
+    soft_skills: ["Problem Solving","Leadership","Communication","Teamwork","Attention to Detail","Critical Thinking","Safety Awareness","Adaptability","Work Ethic","Negotiation"],
+    jobs: {
+      "Structural Engineer":         mkj({"STAAD.Pro":5,ETABS:5,AutoCAD:5,"ANSYS":4,SAP2000:4,"Tekla Structures":4,"Revit (BIM)":3,SAFE:4},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "Civil Engineer":              mkj({AutoCAD:5,"STAAD.Pro":4,ETABS:4,Civil_3D:4,MATLAB:3,"MS Project":4,Primavera_P6:3,SAFE:3},{Problem_Solving:5,Attention_to_Detail:4,Teamwork:4}),
+      "Geotechnical Engineer":       mkj({AutoCAD:4,PLAXIS:5,MATLAB:4,"ANSYS":3,GIS_Tools:3,Civil_3D:3,"STAAD.Pro":3,ArcGIS:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Transportation Engineer":     mkj({AutoCAD:5,Civil_3D:5,"MS Project":4,ArcGIS:4,GIS_Tools:4,OpenRoads:4,Primavera_P6:3},{Analytical_Thinking:4,Problem_Solving:4,Communication:4}),
+      "Water Resources Engineer":    mkj({"HEC-RAS":5,"HEC-HMS":5,AutoCAD:4,GIS_Tools:4,ArcGIS:4,MATLAB:4,Civil_3D:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Environmental Engineer":      mkj({ArcGIS:4,GIS_Tools:4,AutoCAD:4,"HEC-RAS":3,"HEC-HMS":3,MATLAB:3,Civil_3D:3},{Communication:5,Adaptability:4,Problem_Solving:4,Work_Ethic:5}),
+      "Bridge Engineer":             mkj({"STAAD.Pro":5,ETABS:5,"ANSYS":4,SAP2000:4,AutoCAD:5,"Tekla Structures":4,MATLAB:3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "Highway Engineer":            mkj({AutoCAD:5,Civil_3D:5,OpenRoads:4,"MS Project":3,Primavera_P6:3,ArcGIS:3,GIS_Tools:3},{Problem_Solving:5,Attention_to_Detail:4,Communication:4}),
+      "Urban Planner":               mkj({ArcGIS:5,GIS_Tools:5,AutoCAD:4,Civil_3D:3,"MS Project":3,Primavera_P6:3,Navisworks:3},{Communication:5,Critical_Thinking:5,Leadership:4,Creativity:4}),
+      "Construction Manager":        mkj({"MS Project":5,Primavera_P6:5,AutoCAD:4,"Revit (BIM)":4,Navisworks:4,"STAAD.Pro":3,ETABS:3},{Leadership:5,Communication:5,Problem_Solving:5,Safety_Awareness:5}),
+      "Project Engineer":            mkj({"MS Project":5,Primavera_P6:5,AutoCAD:4,"STAAD.Pro":3,ETABS:3,"Revit (BIM)":4,Navisworks:4},{Leadership:4,Communication:5,Teamwork:5,Problem_Solving:4}),
+      "Site Engineer":               mkj({AutoCAD:4,"STAAD.Pro":3,ETABS:3,"MS Project":4,Primavera_P6:3,"Revit (BIM)":3,Navisworks:3},{Communication:5,Safety_Awareness:5,Teamwork:4,Problem_Solving:4}),
+      "Quantity Surveyor":           mkj({AutoCAD:4,"MS Project":4,Primavera_P6:4,"STAAD.Pro":2,ETABS:2,Navisworks:3,"Revit (BIM)":3},{Attention_to_Detail:5,Analytical_Thinking:5,Negotiation:4,Communication:5}),
+      "Estimation Engineer":         mkj({AutoCAD:4,"MS Project":4,Primavera_P6:4,"STAAD.Pro":3,Navisworks:3,"Revit (BIM)":3,ETABS:2},{Attention_to_Detail:5,Analytical_Thinking:5,Communication:4}),
+      "Planning Engineer":           mkj({"MS Project":5,Primavera_P6:5,AutoCAD:4,Navisworks:4,"Revit (BIM)":3,"STAAD.Pro":2,ETABS:2},{Leadership:4,Critical_Thinking:5,Problem_Solving:5,Communication:4}),
+      "Survey Engineer":             mkj({AutoCAD:5,Civil_3D:4,ArcGIS:4,GIS_Tools:4,"MS Project":3,Navisworks:2,OpenRoads:3},{Attention_to_Detail:5,Problem_Solving:4,Analytical_Thinking:4}),
+      "Safety Engineer":             mkj({AutoCAD:4,"MS Project":3,Primavera_P6:3,"STAAD.Pro":2,ETABS:2,Navisworks:3,"Revit (BIM)":3},{Safety_Awareness:5,Communication:5,Leadership:4,Attention_to_Detail:5}),
+      "Quality Control Engineer":    mkj({AutoCAD:4,"STAAD.Pro":3,ETABS:3,"MS Project":3,Navisworks:3,Tekla_Structures:3,"Revit (BIM)":3},{Attention_to_Detail:5,Analytical_Thinking:5,Critical_Thinking:4}),
+      "BIM Engineer":                mkj({"Revit (BIM)":5,Navisworks:5,AutoCAD:5,"Tekla Structures":4,Civil_3D:4,"MS Project":3,Primavera_P6:3},{Creativity:4,Attention_to_Detail:5,Problem_Solving:4}),
+      "Infrastructure Engineer":     mkj({AutoCAD:5,Civil_3D:4,"MS Project":4,Primavera_P6:3,"STAAD.Pro":3,ArcGIS:3,GIS_Tools:3},{Problem_Solving:5,Leadership:4,Teamwork:4,Communication:4}),
+      "Foundation Engineer":         mkj({PLAXIS:5,"STAAD.Pro":4,AutoCAD:4,"ANSYS":4,MATLAB:3,SAP2000:4,ETABS:3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:5}),
+      "Retaining Wall Engineer":     mkj({"STAAD.Pro":4,PLAXIS:4,AutoCAD:4,SAP2000:3,ETABS:3,"ANSYS":3,MATLAB:3},{Analytical_Thinking:5,Attention_to_Detail:5,Problem_Solving:4}),
+      "Tunnel Engineer":             mkj({"STAAD.Pro":4,PLAXIS:5,AutoCAD:4,"ANSYS":4,MATLAB:3,GIS_Tools:3,SAP2000:3},{Analytical_Thinking:5,Safety_Awareness:5,Problem_Solving:5}),
+      "Dam Engineer":                mkj({"HEC-RAS":4,"HEC-HMS":4,"STAAD.Pro":4,AutoCAD:4,PLAXIS:4,MATLAB:4,"ANSYS":3},{Analytical_Thinking:5,Safety_Awareness:5,Problem_Solving:5}),
+      "Irrigation Engineer":         mkj({"HEC-RAS":5,"HEC-HMS":4,AutoCAD:4,ArcGIS:4,GIS_Tools:4,Civil_3D:3,MATLAB:3},{Analytical_Thinking:5,Problem_Solving:5,Work_Ethic:4}),
+      "Coastal Engineer":            mkj({"HEC-RAS":5,"HEC-HMS":4,ArcGIS:4,GIS_Tools:4,MATLAB:4,AutoCAD:4,Civil_3D:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:4}),
+      "Earthquake Engineer":         mkj({ETABS:5,"STAAD.Pro":4,SAP2000:5,"ANSYS":4,MATLAB:5,AutoCAD:3,HyperMesh:3},{Analytical_Thinking:5,Problem_Solving:5,Attention_to_Detail:5}),
+      "Pavement Engineer":           mkj({AutoCAD:4,Civil_3D:4,OpenRoads:4,ArcGIS:3,GIS_Tools:3,MATLAB:4,"MS Project":3},{Analytical_Thinking:4,Problem_Solving:4,Attention_to_Detail:5}),
+      "Contracts Engineer":          mkj({AutoCAD:3,"MS Project":4,Primavera_P6:4,Navisworks:3,"STAAD.Pro":2,ETABS:2,SAP2000:2},{Negotiation:5,Communication:5,Attention_to_Detail:5,Critical_Thinking:4}),
+      "Field Engineer":              mkj({AutoCAD:4,"MS Project":3,Primavera_P6:3,"STAAD.Pro":3,ETABS:3,Civil_3D:3,Navisworks:3},{Communication:5,Safety_Awareness:5,Adaptability:4,Teamwork:4}),
+      "Design Engineer (Civil)":     mkj({"STAAD.Pro":5,ETABS:5,AutoCAD:5,SAP2000:4,"ANSYS":4,"Revit (BIM)":4,"Tekla Structures":4},{Attention_to_Detail:5,Creativity:4,Analytical_Thinking:5}),
+      "Wastewater Engineer":         mkj({"HEC-RAS":4,AutoCAD:4,ArcGIS:3,GIS_Tools:3,MATLAB:3,Civil_3D:3,"HEC-HMS":3},{Problem_Solving:5,Analytical_Thinking:4,Work_Ethic:5}),
+      "Rail Engineer":               mkj({AutoCAD:5,Civil_3D:4,OpenRoads:4,"MS Project":4,Primavera_P6:4,"STAAD.Pro":3,Navisworks:4},{Problem_Solving:5,Safety_Awareness:5,Communication:4}),
+      "Port & Harbour Engineer":     mkj({"HEC-RAS":4,AutoCAD:4,Civil_3D:3,"STAAD.Pro":4,"ANSYS":3,ArcGIS:3,GIS_Tools:3},{Analytical_Thinking:5,Problem_Solving:5,Safety_Awareness:4}),
+      "Airport Engineer":            mkj({AutoCAD:5,Civil_3D:4,OpenRoads:3,"MS Project":4,Primavera_P6:4,"STAAD.Pro":3,ArcGIS:3},{Safety_Awareness:5,Problem_Solving:5,Communication:4,Leadership:4}),
+    }
+  }
+};
+
+// Helper to make job object
+function mkj(tech, soft) {
+  const t = {}, s = {};
+  for (const [k,v] of Object.entries(tech)) t[k.replace(/_/g,' ')] = v;
+  for (const [k,v] of Object.entries(soft)) s[k.replace(/_/g,' ')] = v;
+  return { tech: t, soft: s };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CAREER INFO (certifications, projects, roadmap per role)
+// ═══════════════════════════════════════════════════════════════
+const CAREER_INFO = {
+  default: {
+    certs: ["Domain-specific Coursera/Udemy certifications","Industry-recognized professional certifications","LinkedIn Learning courses","Relevant bootcamp programs"],
+    projects: ["Build a portfolio project using your top skills","Contribute to open-source or collaborative projects","Develop a real-world capstone project","Create a professional GitHub/portfolio"],
+    roadmap: ["Build strong foundation in core skills","Complete 2–3 relevant certifications","Work on real-world projects","Apply for internships or entry-level roles","Network actively on LinkedIn"],
+    jobs: ["Junior roles in your chosen domain","Internship → Full-time conversion","Freelancing to build experience","Startup opportunities for faster growth"]
+  },
+  // CSE / IT
+  "Software Engineer":         {certs:["Oracle Java SE Cert","AWS Certified Developer","Google Associate Cloud Engineer"],projects:["Build a RESTful API service","Create a task management full-stack app","Contribute to open-source on GitHub"],roadmap:["Master DSA & OOP","Learn system design","Build portfolio projects","Apply to product companies"],jobs:["Software Engineer – SDE1","Junior Backend Developer","Associate Software Engineer","Full Stack Developer"]},
+  "Full Stack Developer":      {certs:["MERN Stack Certification","AWS Solutions Architect","Meta Front-End Developer Certificate"],projects:["E-commerce full-stack app","Real-time chat application","SaaS product on cloud"],roadmap:["Master React + Node.js","Learn SQL & NoSQL","Get cloud experience","Build 3+ projects","Apply to startups/product firms"],jobs:["Full Stack Developer","Web Application Engineer","Software Engineer – Full Stack","MERN Stack Developer"]},
+  "Machine Learning Engineer": {certs:["DeepLearning.AI TensorFlow Developer","AWS ML Specialty","Google Professional ML Engineer"],projects:["Image classifier with CNN","Recommendation system","ML API with FastAPI"],roadmap:["Master Python + ML fundamentals","Learn TensorFlow/PyTorch","Understand MLOps","Build end-to-end projects","Target AI teams"],jobs:["ML Engineer","AI Developer","Junior Research Scientist","Data Engineer"]},
+  "Data Scientist":            {certs:["Google Data Analytics Certificate","IBM Data Science Professional","Kaggle Competitions"],projects:["End-to-end ML pipeline","Sentiment analysis NLP","Predictive analytics dashboard"],roadmap:["Master Python, Pandas, NumPy","Learn ML algorithms","Get comfortable with SQL","Complete 3+ Kaggle projects","Apply to analytics roles"],jobs:["Data Scientist","ML Engineer","Research Analyst","Data Analyst (entry level)"]},
+  "DevOps Engineer":           {certs:["Docker Certified Associate","Certified Kubernetes Administrator","AWS DevOps Engineer Professional"],projects:["CI/CD pipeline setup","Microservices on Kubernetes","Terraform infrastructure automation"],roadmap:["Learn Linux fundamentals","Master Docker & Kubernetes","Practice CI/CD","Get AWS/GCP cert","Target DevOps/SRE roles"],jobs:["DevOps Engineer","Site Reliability Engineer","Cloud Engineer","Platform Engineer"]},
+  "Cybersecurity Analyst":     {certs:["CompTIA Security+","CEH (Certified Ethical Hacker)","OSCP (Offensive Security)"],projects:["Home lab for pen testing","CTF challenges (TryHackMe)","Security monitoring dashboard"],roadmap:["Learn networking fundamentals","Master Linux & scripting","Practice ethical hacking","Get Security+","Apply to SOC/pen tester roles"],jobs:["Security Analyst","SOC Analyst","Penetration Tester","Information Security Engineer"]},
+  "AI Engineer":               {certs:["DeepLearning.AI Specialization","Google Professional ML Engineer","AWS AI Practitioner"],projects:["Generative AI chatbot","Computer vision pipeline","NLP sentiment classifier"],roadmap:["Master Python + DL frameworks","Learn MLOps","Build AI products","Contribute to AI open source","Apply to AI-first companies"],jobs:["AI Engineer","ML Engineer","Research Scientist (junior)","NLP Engineer"]},
+  "Cloud Engineer":            {certs:["AWS Solutions Architect Associate","Azure Administrator","Google Associate Cloud Engineer"],projects:["Multi-cloud deployment","Serverless application","Cloud cost optimization dashboard"],roadmap:["Learn cloud fundamentals","Master IaC (Terraform)","Get certified (AWS/Azure/GCP)","Build cloud projects","Apply to cloud-native companies"],jobs:["Cloud Engineer","Cloud Architect","Infrastructure Engineer","Site Reliability Engineer"]},
+  // ECE
+  "VLSI Design Engineer":      {certs:["Cadence Digital Design Certification","Synopsys Training","NPTEL VLSI Design"],projects:["RTL to GDS flow for a simple processor","FPGA-based digital circuit","4-bit ALU in Verilog"],roadmap:["Master Verilog/VHDL","Learn EDA tools (Cadence/Synopsys)","Work on FPGA prototypes","Apply to semiconductor companies"],jobs:["VLSI Design Engineer","RTL Design Engineer","Verification Engineer","ASIC Physical Design Engineer"]},
+  "Embedded Systems Engineer": {certs:["ARM Embedded Systems Cert","FreeRTOS Training","Certified Embedded Systems Engineer (CESE)"],projects:["Smart sensor with STM32","RTOS-based task scheduler","IoT home automation system"],roadmap:["Master C/Embedded C","Learn RTOS & microcontrollers","Practice with dev boards","Build HW+SW projects","Target automotive/IoT companies"],jobs:["Embedded Software Engineer","Firmware Engineer","IoT Developer","RTOS Programmer"]},
+  "IoT Engineer":              {certs:["AWS IoT Core Certification","Cisco IoT Fundamentals","Google Cloud IoT Training"],projects:["Smart home automation","Industrial IoT dashboard","Wearable health monitor"],roadmap:["Master embedded C & protocols","Learn cloud IoT platforms","Build connected device projects","Get cloud certification","Apply to IoT product companies"],jobs:["IoT Engineer","Embedded IoT Developer","IoT Solutions Architect","Smart Systems Engineer"]},
+  // EEE
+  "Power Systems Engineer":    {certs:["MATLAB/Simulink for Power Systems","AutoCAD Electrical Certified","IEEE Power & Energy certifications"],projects:["Power flow analysis simulation","Solar grid design","PLC-based industrial automation"],roadmap:["Master MATLAB & SCADA tools","Learn power electronics","Practice with simulation software","Get internship in power sector","Target utilities/energy companies"],jobs:["Power Systems Engineer","Electrical Design Engineer","Energy Consultant","Control Systems Engineer"]},
+  "EV Engineer":               {certs:["Electric Vehicle Technology (Coursera)","Power Electronics for EVs (edX)","MATLAB Simulink for EVs"],projects:["BMS simulation in MATLAB","Motor drive control design","EV range prediction model"],roadmap:["Master power electronics & motor drives","Learn battery management systems","Work on EV simulation projects","Get internship in automotive/EV sector","Apply to EV startups or OEMs"],jobs:["EV Engineer","Power Electronics Engineer","Battery Systems Engineer","Automotive Embedded Engineer"]},
+  "Renewable Energy Engineer": {certs:["Solar Energy Basics (Coursera)","Wind Energy Certificate (edX)","NABCEP PV Installation"],projects:["Solar plant energy yield analysis","Wind farm layout optimization","Hybrid microgrid simulation"],roadmap:["Learn solar/wind system design","Master ETAP & MATLAB","Study grid integration","Get NABCEP or equivalent cert","Apply to renewable energy companies"],jobs:["Solar Engineer","Wind Energy Engineer","Renewable Energy Consultant","Energy Systems Analyst"]},
+  // Mechanical
+  "Mechanical Engineer":       {certs:["SolidWorks CSWA","ANSYS Learning Certificate","Six Sigma Green Belt"],projects:["FEA analysis of a structural component","CAD design of a mechanical assembly","CFD simulation of flow over a body"],roadmap:["Master AutoCAD & SolidWorks","Learn FEA/CFD simulation","Get Six Sigma basics","Build design portfolio","Apply to manufacturing/auto firms"],jobs:["Mechanical Engineer","Design Engineer","Product Development Engineer","Manufacturing Engineer"]},
+  "Design Engineer":           {certs:["SolidWorks CSWP","CATIA Certification","AutoDesk Inventor Certified"],projects:["Complete product design lifecycle","Reverse engineering project","3D printable assembly design"],roadmap:["Master SolidWorks/CATIA","Learn GD&T thoroughly","Study material science","Build design portfolio","Apply to product design companies"],jobs:["Design Engineer","Product Designer","CAD Engineer","R&D Design Engineer"]},
+  "Automotive Engineer":       {certs:["SAE International Certifications","CATIA Automotive Design","ANSYS NVH Analysis"],projects:["Car body aerodynamics CFD","Suspension system design","EV powertrain simulation"],roadmap:["Master CATIA & ANSYS","Learn automotive standards","Study NVH & crash analysis","Get internship in auto OEM","Apply to automotive manufacturers"],jobs:["Automotive Engineer","Vehicle Dynamics Engineer","Powertrain Engineer","Body Structure Engineer"]},
+  "Manufacturing Engineer":    {certs:["Six Sigma Green Belt","Lean Manufacturing (SME)","CNC Machining Certificate"],projects:["Process improvement using Lean","CNC programming for a complex part","Production line simulation"],roadmap:["Master Lean & Six Sigma","Learn CNC & PLC programming","Study manufacturing processes","Get industry internship","Apply to manufacturing plants"],jobs:["Manufacturing Engineer","Process Engineer","Production Engineer","Industrial Engineer"]},
+  // Civil
+  "Structural Engineer":       {certs:["AutoCAD Certified Professional","ANSYS Structural Simulation","PMP (Project Management Professional)"],projects:["Bridge load analysis (STAAD.Pro)","Multi-story building design (ETABS)","FEM analysis with ANSYS"],roadmap:["Master AutoCAD & STAAD.Pro","Learn structural analysis","Get internship in construction firm","Build portfolio of design projects","Target infrastructure/construction companies"],jobs:["Structural Engineer","Civil Design Engineer","Project Engineer","Site Engineer"]},
+  "Construction Manager":      {certs:["PMP (Project Management Professional)","PRINCE2 Foundation","LEED Green Associate"],projects:["Construction schedule using Primavera","BIM coordination with Revit","Cost estimation for a building project"],roadmap:["Learn project management fundamentals","Master Primavera & MS Project","Understand BIM workflows","Get site experience","Apply to construction firms or PMC"],jobs:["Construction Manager","Project Manager","Site Manager","Senior Project Engineer"]},
+  "Water Resources Engineer":  {certs:["HEC-RAS Certification","GIS Professional (GISP)","Water Resources Engineering (Coursera)"],projects:["Flood modeling with HEC-RAS","Watershed hydrology study","Water distribution network design"],roadmap:["Master HEC-RAS & HEC-HMS","Learn GIS tools","Study hydrology principles","Get internship in water sector","Apply to consulting or government bodies"],jobs:["Water Resources Engineer","Hydrologist","Hydraulic Engineer","Environmental Water Engineer"]},
+  "Geotechnical Engineer":     {certs:["PLAXIS Training Certificate","Geotechnical Engineering (ASCE)","AutoCAD Certified Professional"],projects:["Slope stability analysis (PLAXIS)","Foundation design for a structure","Soil investigation report preparation"],roadmap:["Master PLAXIS & soil mechanics","Learn foundation design","Get site investigation experience","Apply to geotechnical consulting firms"],jobs:["Geotechnical Engineer","Foundation Engineer","Soil Investigation Engineer","Tunnel Engineer"]}
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE & NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+let state = { name:'', dept:'', cgpa:0, techSelected:[], softSelected:[], results:[] };
+
+function startOver() {
+  currentUser = null;
+  state = { name:'', dept:'', cgpa:0, techSelected:[], softSelected:[], results:[] };
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  const loginErr = document.getElementById('loginError');
+  if (loginErr) loginErr.style.display = 'none';
+  document.getElementById('studentName').value = '';
+  document.getElementById('studentDept').value = '';
+  document.getElementById('studentCgpa').value = '';
+  document.getElementById('cgpaHint').style.display = 'none';
+  pageHistory = [];
+  switchTab('login');
+  showPage('loginPage');
+}
+
+let pageHistory = [];
+
+function showPage(id) {
+  const current = document.querySelector('.page.active');
+  if (current && current.id !== id) pageHistory.push(current.id);
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  const backBtn = document.getElementById('backBtn');
+  if (id === 'loginPage' || pageHistory.length === 0) {
+    backBtn.classList.remove('visible');
+    pageHistory = [];
+  } else {
+    backBtn.classList.add('visible');
+  }
+}
+
+function goBack() {
+  if (pageHistory.length === 0) return;
+  const prev = pageHistory.pop();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(prev).classList.add('active');
+  window.scrollTo(0,0);
+  const backBtn = document.getElementById('backBtn');
+  if (prev === 'loginPage' || pageHistory.length === 0) {
+    backBtn.classList.remove('visible');
+    pageHistory = [];
+  } else {
+    backBtn.classList.add('visible');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USER ACCOUNTS (stored in memory)
+// ═══════════════════════════════════════════════════════════════
+let registeredUsers = []; // { username, password, name, registeredAt, lastResult }
+
+const ADMIN_EMAIL = 'admin@admin.com';
+const ADMIN_PASS = 'admin123';
+
+let currentUser = null; // logged-in user object
+
+function switchTab(tab) {
+  const loginBtn = document.getElementById('tabLogin');
+  const signupBtn = document.getElementById('tabSignup');
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const activeStyle = 'background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;';
+  const inactiveStyle = 'background:transparent;color:var(--muted);';
+  if (tab === 'login') {
+    loginBtn.style.cssText += activeStyle;
+    signupBtn.style.cssText += inactiveStyle;
+    loginForm.style.display = 'block';
+    signupForm.style.display = 'none';
+  } else {
+    signupBtn.style.cssText += activeStyle;
+    loginBtn.style.cssText += inactiveStyle;
+    signupForm.style.display = 'block';
+    loginForm.style.display = 'none';
+  }
+}
+
+function doSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const p = document.getElementById('signupPassword').value.trim();
+  const c = document.getElementById('signupConfirm').value.trim();
+  const errEl = document.getElementById('signupError');
+  const okEl = document.getElementById('signupSuccess');
+  errEl.style.display = 'none';
+  okEl.style.display = 'none';
+
+  function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
+
+  if (!name) return showErr('Please enter your full name.');
+  if (!email) return showErr('Please enter your email address.');
+  // Basic email format check
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr('Please enter a valid email (e.g. abc@gmail.com).');
+  if (!p) return showErr('Please create a password.');
+  if (p.length < 4) return showErr('Password must be at least 4 characters.');
+  if (p !== c) return showErr('Passwords do not match.');
+  if (registeredUsers.find(x => x.email === email))
+    return showErr('This email is already registered. Please sign in.');
+
+  registeredUsers.push({ email: email, password: p, name: name, registeredAt: new Date().toLocaleString(), lastResult: null });
+  okEl.textContent = `✅ Account created! Welcome, ${name}. Please sign in.`;
+  okEl.style.display = 'block';
+  document.getElementById('signupName').value = '';
+  document.getElementById('signupEmail').value = '';
+  document.getElementById('signupPassword').value = '';
+  document.getElementById('signupConfirm').value = '';
+  setTimeout(() => { switchTab('login'); okEl.style.display='none'; }, 2000);
+}
+
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const p = document.getElementById('loginPassword').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  if (!email || !p) { errEl.textContent = 'Please enter email and password.'; errEl.style.display='block'; return; }
+
+  // Admin check (admin still uses email-style login)
+  if (email === ADMIN_EMAIL && p === ADMIN_PASS) {
+    currentUser = null;
+    renderAdminPanel();
+    showPage('adminPage');
+    return;
+  }
+
+  // User check
+  const user = registeredUsers.find(x => x.email === email && x.password === p);
+  if (!user) {
+    errEl.textContent = 'Invalid email or password.';
+    errEl.style.display = 'block';
+    return;
+  }
+  currentUser = user;
+  document.getElementById('studentName').value = user.name || '';
+  showPage('studentPage');
+}
+
+function renderAdminPanel() {
+  document.getElementById('adminUserCount').textContent = registeredUsers.length;
+  document.getElementById('adminShowEmail').textContent = ADMIN_EMAIL;
+  document.getElementById('adminShowPass').textContent = ADMIN_PASS;
+  const list = document.getElementById('adminUserList');
+  if (registeredUsers.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);">
+      <div style="font-size:48px;margin-bottom:16px;">👥</div>
+      <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">No users registered yet</div>
+      <div style="font-size:13px;">Users who sign up will appear here.</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = registeredUsers.map((u, i) => `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));"></div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👤</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;">${u.name}</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Joined: ${u.registeredAt}</div><div style="display:flex;gap:12px;flex-wrap:wrap;"><span style="font-size:12px;">📧 <span style="color:var(--accent);font-weight:600;">${u.email}</span></span><span style="font-size:12px;">🔑 <span style="color:var(--accent2);font-weight:600;">${u.password}</span></span></div>
+        </div>
+        <div style="margin-left:auto;background:rgba(79,140,255,0.12);border:1px solid rgba(79,140,255,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--accent);">User #${i+1}</div>
+      </div>
+      ${u.lastResult ? `
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;">
+          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">🎯 Last Career Result</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+            <span style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);color:var(--accent3);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">Dept: ${u.lastResult.dept}</span>
+            <span style="background:rgba(79,140,255,0.1);border:1px solid rgba(79,140,255,0.3);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">CGPA: ${u.lastResult.cgpa}</span>
+            <span style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:var(--accent2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">Skills: ${u.lastResult.techCount} tech + ${u.lastResult.softCount} soft</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${u.lastResult.top3.map((r,j)=>`
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:14px;">${['🥇','🥈','🥉'][j]}</span>
+                <span style="font-size:13px;color:var(--text);font-weight:600;flex:1;">${r.name}</span>
+                <span style="font-size:12px;color:var(--accent);font-weight:700;">${r.pct}%</span>
+              </div>
+            `).join('')}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px;">Predicted on: ${u.lastResult.date}</div>
+        </div>
+      ` : `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;color:var(--muted);">⏳ No career prediction done yet.</div>`}
+    </div>
+  `).join('');
+}
+
+function updateCgpaHint() {
+  const cgpa = parseFloat(document.getElementById('studentCgpa').value) || 0;
+  const hint = document.getElementById('cgpaHint');
+  const dot = document.getElementById('cgpaDot');
+  const txt = document.getElementById('cgpaHintText');
+  hint.style.display = 'flex';
+  if (cgpa >= 8.5)       { dot.style.background='#34d399'; txt.textContent='Excellent CGPA! High confidence recommendations.'; }
+  else if (cgpa >= 7.5)  { dot.style.background='#4f8cff'; txt.textContent='Good CGPA. Solid recommendations across career paths.'; }
+  else if (cgpa >= 6.5)  { dot.style.background='#fbbf24'; txt.textContent='Average CGPA. Skill-matching will be the primary factor.'; }
+  else if (cgpa > 0)     { dot.style.background='#f87171'; txt.textContent='Lower CGPA detected. Strong skills can still lead to great opportunities!'; }
+}
+document.getElementById('studentCgpa').addEventListener('input', updateCgpaHint);
+
+function goToSkills() {
+  const name = document.getElementById('studentName').value.trim();
+  const dept = document.getElementById('studentDept').value;
+  const cgpa = parseFloat(document.getElementById('studentCgpa').value);
+  if (!name) { alert('Please enter your name'); return; }
+  if (!dept) { alert('Please select your department'); return; }
+  if (!cgpa || cgpa < 0 || cgpa > 10) { alert('Please enter a valid CGPA (0–10)'); return; }
+
+  state.name = name; state.dept = dept; state.cgpa = cgpa;
+  state.techSelected = []; state.softSelected = [];
+
+  document.getElementById('headerName').textContent = name;
+  document.getElementById('headerDept').textContent = dept;
+  document.getElementById('headerCgpa').textContent = cgpa;
+
+  const deptData = CAREER_DATA[dept];
+  const techDiv = document.getElementById('techChips');
+  const softDiv = document.getElementById('softChips');
+  techDiv.innerHTML = '';
+  softDiv.innerHTML = '';
+
+  document.getElementById('techBadge').textContent = deptData.tech_skills.length + ' skills';
+  document.getElementById('softBadge').textContent = deptData.soft_skills.length + ' skills';
+
+  deptData.tech_skills.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'skill-chip';
+    chip.textContent = s;
+    chip.onclick = () => toggleSkill(chip, s, 'tech');
+    techDiv.appendChild(chip);
+  });
+
+  deptData.soft_skills.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'skill-chip';
+    chip.textContent = s;
+    chip.onclick = () => toggleSkill(chip, s, 'soft');
+    softDiv.appendChild(chip);
+  });
+
+  updateCounts();
+  showPage('skillsPage');
+}
+
+function toggleSkill(chip, skill, type) {
+  if (type === 'tech') {
+    const idx = state.techSelected.indexOf(skill);
+    if (idx === -1) { state.techSelected.push(skill); chip.classList.add('selected'); }
+    else { state.techSelected.splice(idx, 1); chip.classList.remove('selected'); }
+  } else {
+    const idx = state.softSelected.indexOf(skill);
+    if (idx === -1) { state.softSelected.push(skill); chip.classList.add('selected-soft'); }
+    else { state.softSelected.splice(idx, 1); chip.classList.remove('selected-soft'); }
+  }
+  updateCounts();
+}
+
+function updateCounts() {
+  document.getElementById('techCount').textContent = state.techSelected.length + ' selected';
+  document.getElementById('softCount').textContent = state.softSelected.length + ' selected';
+  document.getElementById('predictBtn').disabled = (state.techSelected.length === 0 && state.softSelected.length === 0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCORING ALGORITHM
+// ═══════════════════════════════════════════════════════════════
+function predict() {
+  const deptData = CAREER_DATA[state.dept];
+  const jobs = deptData.jobs;
+  const cgpaMult = state.cgpa >= 8.5 ? 1.12 : state.cgpa >= 7.5 ? 1.06 : state.cgpa >= 6.5 ? 1.0 : 0.94;
+
+  const scores = Object.entries(jobs).map(([jobName, jobData]) => {
+    let techScore = 0, softScore = 0;
+    state.techSelected.forEach(s => { if (jobData.tech[s]) techScore += jobData.tech[s]; });
+    state.softSelected.forEach(s => { if (jobData.soft[s]) softScore += jobData.soft[s]; });
+
+    const maxTech = Object.values(jobData.tech).sort((a,b)=>b-a).slice(0, Math.max(state.techSelected.length,1)).reduce((a,b)=>a+b,0) || 1;
+    const maxSoft = Object.values(jobData.soft).sort((a,b)=>b-a).slice(0, Math.max(state.softSelected.length,1)).reduce((a,b)=>a+b,0) || 1;
+
+    const techNorm = state.techSelected.length > 0 ? techScore / maxTech : 0;
+    const softNorm = state.softSelected.length > 0 ? softScore / maxSoft : 0;
+    const w = (state.techSelected.length > 0 && state.softSelected.length > 0) ? 0.65 : (state.techSelected.length > 0 ? 1.0 : 0);
+    const rawScore = (w * techNorm + (1-w) * softNorm) * cgpaMult;
+
+    return { name: jobName, score: rawScore };
+  });
+
+  scores.sort((a,b) => b.score - a.score);
+  const top = scores.slice(0,3);
+  const maxRaw = top[0].score;
+  const results = top.map((r, i) => ({
+    name: r.name,
+    pct: Math.round(Math.min(95, (r.score / maxRaw) * (95 - i*8))),
+    score: r.score
+  }));
+
+  state.results = results;
+  // Save to user profile for admin view
+  if (currentUser) {
+    currentUser.lastResult = {
+      dept: state.dept,
+      cgpa: state.cgpa,
+      techCount: state.techSelected.length,
+      softCount: state.softSelected.length,
+      top3: results,
+      date: new Date().toLocaleString()
+    };
+  }
+  renderResults(results);
+  showPage('resultsPage');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER RESULTS
+// ═══════════════════════════════════════════════════════════════
+function renderResults(results) {
+  document.getElementById('resultsSubtitle').textContent =
+    `${state.name} · ${state.dept} · CGPA ${state.cgpa} · ${state.techSelected.length} tech + ${state.softSelected.length} soft skills selected`;
+
+  const labels = ['🥇 Primary Recommendation', '🥈 Secondary Option', '🥉 Alternative Path'];
+  const grid = document.getElementById('top3Grid');
+  grid.innerHTML = '';
+  results.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'match-card' + (i===0?' primary':'');
+    card.innerHTML = `
+      <div class="match-rank">${labels[i]}</div>
+      <div class="match-title">${r.name}</div>
+      <div class="match-pct">${r.pct}%</div>
+      <div class="match-score-bar"><div class="match-score-fill" style="width:0%" id="bar${i}"></div></div>
+      <div class="match-score-label"><span>Match Score</span><span>Based on ${state.techSelected.length + state.softSelected.length} skills</span></div>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => { document.getElementById('bar'+i).style.width = r.pct + '%'; }, 100 + i*150);
+  });
+
+  const primary = results[0];
+  const info = CAREER_INFO[primary.name] || CAREER_INFO.default;
+  const pd = document.getElementById('primaryDetail');
+  pd.innerHTML = `
+    <div class="primary-detail">
+      <div class="pd-header">
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">⭐ Primary Career</div>
+          <div class="pd-title">${primary.name}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="pd-pct">${primary.pct}%</div>
+          <div style="font-size:11px;color:var(--muted);">Match confidence</div>
+        </div>
+      </div>
+      <div class="pd-sections">
+        <div class="pd-section">
+          <div class="pd-section-title">✅ Why This Career?</div>
+          <ul>
+            <li>Strong skill alignment: ${state.techSelected.slice(0,3).join(', ')||'your selected skills'} match well</li>
+            <li>Your ${state.dept} background is directly relevant</li>
+            <li>CGPA of ${state.cgpa} ${state.cgpa >= 7.5 ? 'strengthens' : 'is acceptable for'} your profile</li>
+            <li>High industry demand for ${primary.name}s currently</li>
+          </ul>
+        </div>
+        <div class="pd-section">
+          <div class="pd-section-title">🏅 Recommended Certifications</div>
+          <ul>${info.certs.map(c=>`<li>${c}</li>`).join('')}</ul>
+        </div>
+        <div class="pd-section">
+          <div class="pd-section-title">📁 Suggested Projects</div>
+          <ul>${info.projects.map(p=>`<li>${p}</li>`).join('')}</ul>
+        </div>
+        <div class="pd-section">
+          <div class="pd-section-title">🗺️ How to Get This Job?</div>
+          <ul>${info.roadmap.map(r=>`<li>${r}</li>`).join('')}</ul>
+        </div>
+        <div class="pd-section" style="grid-column: 1 / -1; border-bottom:none;">
+          <div class="pd-section-title">💼 Job Roles to Apply</div>
+          <ul>${info.jobs.map(j=>`<li>${j}</li>`).join('')}</ul>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const tree = document.getElementById('treeSection');
+  tree.innerHTML = `
+    <div class="tree-section">
+      <h3>🌳 Career Path Tree — ${state.name}</h3>
+      <div class="tree">
+        <div class="tree-node">
+          <div class="tree-root">
+            <span style="font-size:18px;">🎓</span>
+            <div>
+              <div class="tree-root-label">${state.name}</div>
+              <div style="font-size:11px;color:var(--muted);">${state.dept} · CGPA ${state.cgpa}</div>
+            </div>
+          </div>
+          <div class="tree-children">
+            ${results.map((r, i) => `
+              <div class="tree-branch">
+                <div class="tree-connector">${i < results.length-1 ? '├─' : '└─'}</div>
+                <div class="tree-leaf">
+                  <div class="tree-leaf-title">${['🥇 Primary','🥈 Secondary','🥉 Alternative'][i]} · ${r.pct}% match</div>
+                  <div style="font-weight:700;color:var(--text);margin-bottom:8px;font-size:13px;">${r.name}</div>
+                  <div class="tree-leaf-title" style="margin-top:6px;">Key Skills for this role</div>
+                  <div class="tree-leaf-items">
+                    ${getTopSkills(r.name, state.dept).map(s=>`<span class="tree-tag">${s}</span>`).join('')}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getTopSkills(jobName, dept) {
+  const job = CAREER_DATA[dept].jobs[jobName];
+  if (!job) return [];
+  return Object.entries(job.tech).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k])=>k);
+}
+</script>
+</body>
+</html>
